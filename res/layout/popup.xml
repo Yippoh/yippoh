@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+       	xmlns:tools="http://schemas.android.com/tools"
+   		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:scrollbarStyle="insideOverlay"
+		android:id="@+id/Scrol_PopUp"
+		android:scrollbarSize="2dip"
+		android:background="@drawable/background">
+    <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:padding="5dp"
+        android:layout_margin="5dp"
+         >
+         <TextView
+				        android:id="@+id/LblStoreTitle"
+				        android:layout_width="200dp"
+				        android:layout_height="wrap_content"
+				        android:textColor="#000000"
+				        android:textSize="16sp"
+				        android:layout_marginLeft="2dp"
+						android:textStyle="bold"
+						android:text="@string/StoreTitle"
+						android:layout_marginTop = "5dp"
+						 android:layout_below="@+id/linearLayout1"
+				        /> 
+ 	 <RadioGroup 
+    	     android:id="@+id/rd_Store_Group"
+	        android:layout_marginTop="5dp"
+	        android:layout_width="300dp"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dp"
+	        android:layout_below="@+id/StoreDetails"
+    	     >
+    	 </RadioGroup>
+    	  <LinearLayout
+			       android:id="@+id/linearLayout1"
+			       android:layout_width="wrap_content"
+			       android:layout_height="wrap_content"
+			       android:layout_marginLeft="5dp"
+			       android:orientation="horizontal"
+			       android:padding="5dp" 
+			       android:visibility="gone"
+			       android:layout_below="@+id/rd_Store_Group">
+			                
+				     <TextView
+				        android:id="@+id/lblStoreName"
+				        android:layout_width="80dp"
+				        android:layout_height="wrap_content"
+				        android:textColor="#000000"
+				        android:textSize="14sp"
+						android:textStyle="bold"
+						android:text="@string/storeName"
+						android:layout_marginTop = "5dp"
+				        />
+				     
+				     <EditText
+				        android:id="@+id/StoreName"
+				        android:layout_width="200dp"
+				        android:layout_height="40dp"
+				        android:layout_marginLeft="5dp"
+				        android:layout_marginRight="10dp"
+				        android:layout_marginTop="5dp"
+				        android:padding="10dp"
+				        android:textSize="14sp"
+						android:textStyle="bold"
+						android:layout_weight="1"
+						android:background="@drawable/text_view_bg"
+				        android:ems="10"
+				        android:text="" 
+				        android:hint=""
+				         />
+  		</LinearLayout>  
+  		
+ 	 	<LinearLayout
+			       android:id="@+id/linearLayout2"
+			       android:layout_width="wrap_content"
+			       android:layout_height="wrap_content"
+			       android:layout_marginLeft="5dp"
+			       android:orientation="horizontal"
+			       android:layout_centerHorizontal="true" 
+			       android:layout_below="@+id/linearLayout1">
+		    	   <Button 
+			        android:id="@+id/Submit_btn"
+			        android:layout_marginTop="20dp"
+			        android:layout_width="100dp"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="15dp"
+			        android:text="@string/Submit"
+			        android:background="@layout/green_btn"
+			        android:textColor="#FFFFFF"
+			        android:textSize="20dp"
+			        android:textStyle="bold"
+			               
+			        />
+		    	    <Button 
+			        android:id="@+id/Cancel_btn"
+			        android:layout_marginTop="20dp"
+			        android:layout_width="100dp"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="20dp"
+			        android:text="@string/Cancel"
+			        android:background="@layout/green_btn"
+			        android:textColor="#FFFFFF"
+			        android:textSize="20dp"
+			        android:textStyle="bold"
+			              
+			        />
+		    	    </LinearLayout>
+		    	    <TextView
+				        android:id="@+id/Lblpopmsg"
+				        android:layout_width="200dp"
+				        android:layout_height="wrap_content"
+				        android:textColor="#000000"
+				        android:textSize="16sp"
+				        android:layout_marginLeft="10dp"
+						android:textStyle="bold"
+						android:text=""
+						android:layout_marginTop = "5dp"
+						 android:layout_below="@+id/linearLayout2"
+				        /> 
+
+  </LinearLayout>
+ </LinearLayout>
+</ScrollView>

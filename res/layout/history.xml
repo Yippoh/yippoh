@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+       	xmlns:tools="http://schemas.android.com/tools"
+   		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:scrollbarStyle="outsideOverlay"
+		
+		android:scrollbarSize="2dip"
+		android:fitsSystemWindows="true"
+    	android:background="@drawable/background">
+ 
+    <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+    
+  	<LinearLayout
+	                android:id="@+id/linearLayout1"
+	                android:layout_marginTop="10dip"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_margin="5dp"
+	                               
+               	>
+						<TextView
+						android:id="@+id/LblHistory"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_weight="0.03"
+						android:textSize="14sp"
+						android:text="@string/histroy"
+					    />
+					
+				</LinearLayout>  
+				
+  		<LinearLayout
+	                android:id="@+id/linearLayout2"
+	                android:layout_marginTop="10dip"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_margin="5dp"
+	                              	>
+						<ImageView 
+         					android:id="@+id/imageLine"
+        					android:layout_width="wrap_content"
+        					android:layout_height="wrap_content"
+        					android:src="@drawable/line"
+        					android:layout_below="@+id/TxtLblRewards"
+         					        						/>	
+				</LinearLayout>  
+  <TableLayout
+ 	     	android:layout_width="315dp"
+    	    android:layout_marginLeft="2dp"
+    	    android:layout_marginRight="2dp"
+			android:layout_height="fill_parent"
+			android:layout_marginTop="5dp"
+			android:stretchColumns="1"
+			android:id="@+id/historyDetailsTbl"
+			android:layout_below="@+id/linearLayout2"
+						>
+				<TableRow
+				    android:background="@layout/table_row"	
+				    android:layout_margin="2dp"	
+				        >
+				        
+				    <TextView
+				            android:text="@string/proName"
+				            android:width="100dp"
+				            android:paddingLeft="10dip" 
+				            android:paddingRight="5dip" 
+				            android:paddingBottom="5dip" 
+				            android:gravity="left" 
+				            android:textStyle="bold"
+				            android:textSize="14sp"
+				                 /> 
+				    <TextView
+				            android:text="@string/latitude"
+				           	android:width="90dp"
+				            android:paddingLeft="10dip" 
+				            android:paddingRight="5dip" 
+				            android:paddingBottom="5dip" 
+				            android:gravity="left" 
+				            android:textStyle="bold"
+				            android:textSize="14sp"
+				            />
+				    <TextView
+				            android:text="@string/longitude"
+				           	android:width="90dp"
+				            android:paddingLeft="10dip" 
+				            android:paddingRight="5dip" 
+				            android:paddingBottom="5dip" 
+				            android:gravity="left" 
+				            android:textStyle="bold"
+				            android:textSize="14sp"
+				            />
+				   
+				</TableRow>
+			
+				</TableLayout>
+			
+				<LinearLayout
+	                android:id="@+id/linearLayout2"
+	                android:layout_marginTop="10dip"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_marginLeft="5dp"
+	                android:orientation="horizontal"
+	                android:padding="5dp" 
+                    android:layout_below="@+id/linearLayout1"
+               	>
+				
+				    
+						<TextView
+						android:id="@+id/msgLbl"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_weight="0.03"
+						android:textSize="14sp"
+						android:textStyle="bold"
+						android:text=""
+						android:visibility="gone"
+						android:gravity="center"
+					    />
+				</LinearLayout>
+				
+     </LinearLayout>
+     
+    </LinearLayout>
+
+   </ScrollView>
+   

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" 
+    android:background="@drawable/background"
+    android:padding="5dp"
+    >
+    <TextView
+				        android:id="@+id/TxtEmail"
+				        android:layout_width="300dp"
+				        android:layout_height="wrap_content"
+				         android:layout_marginLeft="5dp"
+				        android:textSize="16sp"
+						android:textStyle="bold"
+						android:text="@string/lblEmail"
+						android:layout_marginTop = "5dp"
+				        />
+     <ImageView 
+         android:id="@+id/imageLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/line"
+        android:layout_below="@+id/TxtLblRewards"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="5dp"
+        />
+    
+    <LinearLayout
+			       android:id="@+id/linearLayout1"
+			       android:layout_width="wrap_content"
+			       android:layout_height="wrap_content"
+			       android:layout_marginLeft="5dp"
+			       android:layout_marginTop="5dp"
+			       android:orientation="horizontal"
+			        
+			      >
+			                
+				     <TextView
+				        android:id="@+id/lblEmail"
+				        android:layout_width="60dp"
+				        android:layout_height="wrap_content"
+				         android:layout_marginLeft="5dp"
+				        android:textSize="14sp"
+						android:textStyle="bold"
+						android:text="@string/Email"
+						android:layout_marginTop = "5dp"
+				        />
+				     
+				     <EditText
+				        android:id="@+id/txtEmail"
+				        android:layout_width="260dp"
+				        android:layout_height="40dp"
+				        android:layout_marginLeft="5dp"
+				        android:layout_marginRight="10dp"
+				        android:layout_marginTop="5dp"
+				        android:padding="10dp"
+				        android:textSize="14sp"
+						android:textStyle="bold"
+						android:layout_weight="1"
+				        android:background="@drawable/text_view_bg"
+				        android:ems="10"
+				        android:text="" 
+				        android:hint=""
+				         />
+  </LinearLayout>
+	<LinearLayout
+			       android:id="@+id/linearLayout2"
+			       android:layout_width="wrap_content"
+			       android:layout_height="wrap_content"
+			       android:layout_marginLeft="5dp"
+			       android:orientation="horizontal"
+			       android:layout_centerHorizontal="true" 
+			       android:layout_below="@+id/linearLayout1">
+		    	   <Button 
+			        android:id="@+id/Submit"
+			        android:layout_marginTop="20dp"
+			        android:layout_width="100dp"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="15dp"
+			        android:text="@string/Submit"
+			        android:background="@layout/green_btn"
+			        android:textColor="#FFFFFF"
+			        android:textSize="20dp"
+			        android:textStyle="bold"
+			               
+			        />
+		    	    <Button 
+			        android:id="@+id/Cancel_btn"
+			        android:layout_marginTop="20dp"
+			        android:layout_width="100dp"
+			        android:layout_height="wrap_content"
+			        android:layout_marginLeft="20dp"
+			        android:text="@string/Cancel"
+			        android:background="@layout/green_btn"
+			        android:textColor="#FFFFFF"
+			        android:textSize="20dp"
+			        android:textStyle="bold"
+			              
+			        />
+		    	    </LinearLayout>
+  
+   <LinearLayout
+			       android:id="@+id/linearLayout2"
+			       android:layout_width="wrap_content"
+			       android:layout_height="wrap_content"
+			       android:layout_marginLeft="5dp"
+			       android:orientation="horizontal"
+			       android:padding="5dp" 
+			       android:layout_marginTop="15dp"
+			       android:layout_below="@+id/Submit"
+			      >
+				   <TextView
+				        android:id="@+id/lblMsg"
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				         android:layout_marginLeft="15dp"
+				        android:textSize="14sp"
+						android:textStyle="bold"
+						android:layout_centerHorizontal="true"
+						android:text=""
+						android:layout_marginTop = "5dp"
+				        />  
+   </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Yippoh Grocery</string>
+    <string name="title">Yippoh Grocery</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+	<string name="scan_resut_lable">Scan Result:</string>
+	<string name="msg_default_status">Place a barcode inside the viewfinder rectangle to scan it. </string>
+    <string name="price">Enter Price:</string>
+    <string name="priceType">Price Type:</string>
+    <string name="productQua">Product Quantity:</string>
+    <string name="productDetails">Product Details</string>
+    <string name="ProductId">Product ID:</string>
+    <string name="ProductName">Product Name:</string>
+    <string name="Manu">Brand:</string>
+    <string name="BarCode">Barcode:</string>
+    <string name="Address">Address</string>
+    <string name="Price">Price</string>
+    <string name="Email">Email</string>
+    <string name="Submit">Submit</string>
+    <string name="getDet">Get Details</string>
+    <string name="scan">Scan</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="proName">Name</string>
+    <string name="histroy">Histroy Details:</string>
+    <string name="Rewards">Rewards:</string>
+     <string name="storeName">Store Name</string>
+     <string name="Cancel">Cancel</string>
+     <string name="LocationName">Where you are at?</string>
+     <string name="StoreTitle">Select store you are in</string>
+     <string name="redeem">Redeem</string>
+     <string name="lblEmail">Please Provide Email:</string>
+    <!-- Price Type -->
+    <string-array name="price_type_list">
+        <item>Regular</item>
+        <item>Sale</item>
+    </string-array>
+    
+    <!-- Product Quantity -->
+    <string-array name="product_qua_list">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+</resources>
