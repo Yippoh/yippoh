@@ -41,8 +41,10 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="jim.h.common.android.zxingjar.demo.getStoreDetails"
-            android:label="@string/app_name" >
+            android:name="jim.h.common.android.zxingjar.demo.getDetails"
+            android:label="@string/app_name" 
+            android:windowSoftInputMode="adjustPan"
+            >
         </activity>
         <activity
             android:name="jim.h.common.android.zxingjar.demo.showDetails"

@@ -9,10 +9,12 @@ import jim.h.common.android.zxingjar.demo.getStoreDetails.LoadStore;
 import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,25 +31,34 @@ public class TabHostActivity extends TabActivity implements OnTabChangeListener 
 	ProgressDialog progDialog;
 	private int progressBarStatus = 0;
 	String DeviceId,lat,lon;
+	Integer screenHeight,screenWidth;
+	
 	 @Override
 	public void onCreate(Bundle savedInstanceState) {
 		  super.onCreate(savedInstanceState);
 		  requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);	
 		  setContentView(R.layout.tab_host);
-		  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.my_title);	
-//		  ((TextView)findViewById(R.id.title)).setText("gradient shadow");
+		  getScreenDimensions();
+//		  Configuration config = getResources().getConfiguration();
+//		  int size = config.screenLayout & config.SCREENLAYOUT_SIZE_MASK;
+		  if (screenHeight >480)
+		  {
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.my_title);	
+//			  Toast.makeText(getApplicationContext(), "normal", 100).show();
+			  
+		  }
+		  else
+		  {
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.small_my_title);	
+		  }
+		  
+		
 		  findViewById(R.id.back).setVisibility(View.GONE);
 		  findViewById(R.id.logo_btn).setEnabled(false);
-//		  findViewById(R.id.back).setOnClickListener(new OnClickListener() {
-//				public void onClick(View v) {
-//					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,	KeyEvent.KEYCODE_BACK));
-//					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
-//				}
-//			});
-
 		  getLocation();
+		 
 		  receiveDeviceValues();
-	  
+		 
 		  Resources res = getResources(); // Resource object to get Drawables
 		  TabHost tabHost = getTabHost(); // The activity TabHost
 //		// Inbox Tab
@@ -122,16 +133,23 @@ public class TabHostActivity extends TabActivity implements OnTabChangeListener 
 	   	 	String log =null;
 	       for (Contact cn : contacts) {
 	       	log= "\nId: "+cn.getID()+" ,\nName: " + cn.getDeviceID() + " ,\nEmail:"+cn.getEmailID()+"\nCount: " + cn.getCount();
-	       	Toast.makeText(getApplicationContext(), "details saved:" +log, 1000).show();
+//	       	Toast.makeText(getApplicationContext(), "details saved:" +log, 1000).show();
 	       }
 	    		
 	        for(int i=0;i<tabHost.getTabWidget().getChildCount();i++) 
             {
                 TextView tv = (TextView) tabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
                 tv.setTextColor(Color.WHITE);
-                tv.setPadding(0, 0, 0,30);
-                tv.setGravity(Gravity.CENTER);
+                if(screenHeight>480)
+                {
+                	 tv.setPadding(0, 0, 0,30);
+                }
+                else
+                {
+                	 tv.setPadding(0, 0, 0,20);
+                }
                
+                tv.setGravity(Gravity.CENTER);
             } 
 	        tabHost.setOnTabChangedListener(this);
 	        getTabWidget().getChildAt(1).setOnClickListener(new OnClickListener() {
@@ -170,6 +188,17 @@ public class TabHostActivity extends TabActivity implements OnTabChangeListener 
 	        getTabWidget().getChildAt(getTabHost().getCurrentTab()).setBackgroundResource(R.drawable.button_clicked); // selected
 		 }
 	
+	 
+	 @Override
+	 public boolean onKeyDown(int keyCode, KeyEvent event)
+	    {
+	        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
+	            finish();
+	        }
+
+	        return super.onKeyDown(keyCode, event);
+	    }
+		 
 	 public class LoadTab extends AsyncTask<String,Integer,String>{
 	        ProgressDialog dialog;
 	        protected void onPreExecute(){
@@ -246,9 +275,6 @@ public class TabHostActivity extends TabActivity implements OnTabChangeListener 
 		        double longitude = gps.getLongitude();
 		        lat=String.valueOf(latitude);
 		        lon=String.valueOf(longitude);
-//		        Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + lat + "\nLong: " + lon , 500).show();   
-		        
-		       
 		    }
 		    else{
 		        // can't get location
@@ -267,31 +293,14 @@ public class TabHostActivity extends TabActivity implements OnTabChangeListener 
 		    }
 		    getTabWidget().getChildAt(getTabHost().getCurrentTab()).setBackgroundResource(R.drawable.button_clicked); // selected
 	 }
-	 public void ShowProgressBar()
+	 
+	 public void getScreenDimensions()
 	 {
-		 	progDialog = new ProgressDialog(this);
-			progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			progDialog.setMessage("Loading...");
-			progDialog.setProgress(0);
-			progDialog.setMax(100);
-			progDialog.show();
-			progressBarStatus = 0;
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+		screenHeight = displaymetrics.heightPixels;
+		screenWidth = displaymetrics.widthPixels;
+//		Toast.makeText(getApplicationContext(), "width:"+screenWidth+",height:"+screenHeight, 500).show();
 	 }
-	 public void HideProgressBar()
-	 {
-		 new Thread(new Runnable() {
-			  public void run() {
-						// sleep 5 seconds, so that you can see the 100%
-						try {
-							Thread.sleep(1000);
-							progDialog.dismiss();
-							// close the progress bar dialog
-//							progDialog.dismiss();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						}
-			  }).start();	
-	 }
-	
+	 
 }

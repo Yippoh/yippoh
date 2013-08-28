@@ -94,7 +94,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 public void ShowDetails(String scanFormat)
 {
-		Intent getDet = new Intent(this,getStoreDetails.class);
+		Intent getDet = new Intent(this,getDetails.class);
 		getDet.putExtra("BarCode", scanFormat);
 		getDet.putExtra("lat", lat);
 		getDet.putExtra("lon", lon);

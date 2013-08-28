@@ -66,7 +66,7 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	private static String jsonResult = "success";
 	private TextView formatTxt, contentTxt,ProductDet,Results,AddressTxt,LocPriceTxt,LocationDetLbl,TxtStoreDetails,StoreName;
 	private EditText PriceTxt;
-	private Button getDetBtn,scanButton;
+	private Button getDetBtn,scanButton,homeButton;
 	ProgressDialog progDialog;
 	private int progressBarStatus = 0;
 	private Handler progressBarHandler = new Handler();
@@ -103,16 +103,18 @@ public class getStoreDetails extends Activity implements OnClickListener{
 		LocPriceTxt=(TextView)findViewById(R.id.LocPriceTxt);
 		LocationDetLbl=(TextView)findViewById(R.id.LocationDetLbl);
 		Results=(TextView)findViewById(R.id.Results);
-		StoreName=(TextView)findViewById(R.id.StoreName);
-		TxtStoreDetails=(TextView)findViewById(R.id.TxtStoreDetails);
+		StoreName=(EditText)findViewById(R.id.StoreName);
+//		TxtStoreDetails=(TextView)findViewById(R.id.TxtStoreDetails);
 		PriceTxt =(EditText)findViewById(R.id.txtPrice); 
 		getDetBtn =(Button)findViewById(R.id.get_details_btn);
 		scanButton=(Button)findViewById(R.id.scan_button);
+		homeButton=(Button)findViewById(R.id.home_button);
 		priceType=(Spinner)findViewById(R.id.priceTypeText);
 		quantity=(Spinner)findViewById(R.id.productquaTxt);
 		receiveIntentValues();
 		getDetBtn.setOnClickListener(this);
 		scanButton.setOnClickListener(this);
+		homeButton.setOnClickListener(this);
 		getScreenDimensions();
 		}
 	public void receiveIntentValues() {
@@ -140,6 +142,7 @@ public class getStoreDetails extends Activity implements OnClickListener{
 			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(PriceTxt.getWindowToken(), 0);
 			Results.setText("");
+			storeValue=StoreName.getText().toString();
 			Price = PriceTxt.getText().toString();
 			Barcode = contentTxt.getText().toString();
 			Type=String.valueOf(priceType.getSelectedItem());	
@@ -154,6 +157,17 @@ public class getStoreDetails extends Activity implements OnClickListener{
 			{
 				didItWork=true;
 			}
+			
+			if(storeValue.length()==0)
+			{
+				StoreName.setError(Html.fromHtml("<font color='red'>Store Name required!</font>"));
+				didItWork=false;
+			}
+			else
+			{
+				didItWork=true;
+			}
+		
 			if((didItWork))
 			{
 				new LoadStore().execute(" ");
@@ -169,6 +183,12 @@ public class getStoreDetails extends Activity implements OnClickListener{
 			IntentIntegrator.initiateScan(this, R.layout.capture,
 	                R.id.viewfinder_view, R.id.preview_view, false);
 			break;
+		
+		case R.id.home_button:
+			Intent tab = new Intent(getStoreDetails.this,TabHostActivity.class);
+        	tab.putExtra("device_id", deviceId);
+		    startActivity(tab);
+			break;	
 		}
 	}
 	
@@ -201,7 +221,7 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	        dialog.incrementProgressBy(progress[0]);
 	    }
 	        protected void onPostExecute(String result){
-	        	JSONObject jsonStre = getStore(Price,Barcode,lat,lon,deviceId,Type,Quant);
+	        	JSONObject jsonStre = getStore(Price,storeValue,Barcode,lat,lon,deviceId,Type,Quant);
 				 if(jsonStre!=null)
 	 			  {
 	               try 
@@ -209,10 +229,8 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	            	   	String message = jsonStre.getString("message");
 	     				TxtStoreDetails.setText("");
 	     				Results.setText("");
-//	     				Toast.makeText(getApplicationContext(), "message:"+message, 500).show();
 	     				if(message.equalsIgnoreCase("Barcode Not Exist")==true)
 	     				{
-//				                         					Toast.makeText(getApplicationContext(), "No Data Found ...", 1000).show();
 	     					TxtStoreDetails.postDelayed(new Runnable() {
 	     					    public void run() {
 	     					    	TxtStoreDetails.setText("Store Details:");
@@ -273,12 +291,9 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	     								{
 	     									 new LoadProductDetails().execute(" ");
 	     									 popup.dismiss();
-	     									 Toast.makeText(getApplicationContext(), "didStore::-"+didStore, 500).show();
-	     									
 	     								}
 	     					    	 	else
 	     					    	 	{
-	     					    	 		 Toast.makeText(getApplicationContext(), "didStore::-"+didStore, 500).show();
 	     					    	 		Toast.makeText(getApplicationContext(), "Please enter the store name...", 100).show();
 	     					    	 	}
 	     					     }
@@ -287,7 +302,7 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	     					     
 	     					   });
 	     					   
-	     						   Button close = (Button) popupView.findViewById(R.id.Cancel_btn);
+	     					   Button close = (Button) popupView.findViewById(R.id.Cancel_btn);
 	     					   close.setOnClickListener(new OnClickListener() {
 	     					 
 	     					     @Override
@@ -409,17 +424,14 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	     								
 	     					    	 	if((didStoreWork) || (storeTextValue))
 	     								{
-	     					    	 		Toast.makeText(getApplicationContext(), "didStore::-"+didStoreWork+",textValue::"+storeTextValue, 500).show();
-//				                         Toast.makeText(getApplicationContext(), "StoreDet::--"+storeValue+",Loc:"+LocValue, 500).show();
+
 	     					    	 		 new LoadProductDetails1().execute(" ");
 	     					    	 		 popup.dismiss();
 	     								}
 	     					    	 	else
 	     					    	 	{
-	     					    	 		Toast.makeText(getApplicationContext(), "didStore::-"+didStoreWork+",textValue::"+storeTextValue, 500).show();
 	     					    	 		Toast.makeText(getApplicationContext(), "Please select any options...", 1000).show();
-//				                         					    	 		popup.setFocusable(true);
-	     					    	 	}
+	    	 				    	 	}
 	     					      
 	     					     }
 	     					   });
@@ -430,8 +442,6 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	     				e.printStackTrace();
 	     			}
 	     		}	
-//	            Intent openList = new Intent("com.integrated.mpr.SENSITIVELIST");
-//	            startActivity(openList);
 	        }
 	    }
 	 
@@ -463,8 +473,7 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	    }
 	        protected void onPostExecute(String result){
 	        	JSONObject jsonPro = getProductDetails(StatId,Barcode,lat,lon,deviceId,Type,Quant,resultid,StoreDet,StreBtnId);
-//					Toast.makeText(getApplicationContext(), "values passed to server:"+ Price +","+ Barcode+","+Type+","+Quant+","+deviceId+","+resultid+","+StoreDet+","+StreBtnId+","+LocValue+","+LocBtnId, 5000).show();
-//					Toast.makeText(getApplicationContext(), "json:"+jsonPro, 500).show();
+
 				if(jsonPro!=null)
 				{
 				try 
@@ -484,7 +493,7 @@ public class getStoreDetails extends Activity implements OnClickListener{
 				ProductPrice=jsonPro.getString("price");
 				ProductManu=jsonPro.getString("manufacture");
 				ProductBarCode= jsonPro.getString("barcode");
-				//								Toast.makeText(getApplicationContext(), "ProductId:"+ProductId, 1000).show();
+				
 				if(ProductId!="null")
 				{
 					if(jsonPro.getString("other_locations")!="null")
@@ -515,11 +524,11 @@ public class getStoreDetails extends Activity implements OnClickListener{
 					
 					}
 					else
-				 {
+					{
 						locationValue="null";
-				locationAddress="null";
-				locationPrice="null";
-				 }
+						locationAddress="null";
+						locationPrice="null";
+					}
 					AddressTxt.setText(locationAddress);
 					LocPriceTxt.setText(locationPrice);
 					final Intent showDetails=new Intent(getStoreDetails.this,showDetails.class);
@@ -569,10 +578,9 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	        dialog.incrementProgressBy(progress[0]);
 	    }
 	        protected void onPostExecute(String result){
-	        	Toast.makeText(getApplicationContext(), "didStore::-"+didStoreWork+",textValue::"+storeTextValue, 500).show();
+
 		    	 JSONObject jsonPro = getProductDetails(StatId,Barcode,lat,lon,deviceId,Type,Quant,resultid,storeValue,StreBtnId);
-//            									Toast.makeText(getApplicationContext(), "values passed to server:"+ Price +","+ Barcode+","+Type+","+Quant+","+deviceId+","+resultid+","+StoreDet+","+StreBtnId+","+LocValue+","+LocBtnId, 5000).show();
-//            									Toast.makeText(getApplicationContext(), "json:"+jsonPro, 500).show();
+
 				if(jsonPro!=null)
 				{
 				  try 
@@ -694,10 +702,11 @@ public class getStoreDetails extends Activity implements OnClickListener{
         return jsonPro;
 	}
 	
-	public JSONObject getStore(String Price,String Barcode,String lat,String lon,String deviceId,String Type,String Quant){
+	public JSONObject getStore(String Price,String storeName,String Barcode,String lat,String lon,String deviceId,String Type,String Quant){
 		 
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("price", Price));
+        params.add(new BasicNameValuePair("storename", storeName));
         params.add(new BasicNameValuePair("barcode", Barcode));
         params.add(new BasicNameValuePair("lat",lat));
         params.add(new BasicNameValuePair("lon",lon));
@@ -717,10 +726,7 @@ public class getStoreDetails extends Activity implements OnClickListener{
 	        	TxtStoreDetails.setText("");
 	        	Results.setText("");
 	        	if(!isConnected(getStoreDetails.this)){
-	        		
-		        	Toast.makeText(getApplicationContext(), "Check your internet connection", 1000).show();
-//		        	ProductDet.setText("Product Details:");
-//					Results.setText("Check your Internet connection");
+	        		Toast.makeText(getApplicationContext(), "Check your internet connection", 1000).show();
 		        	TxtStoreDetails.postDelayed(new Runnable() {
 					    public void run() {
 					    	TxtStoreDetails.setText("Store Details:");
@@ -788,6 +794,5 @@ public class getStoreDetails extends Activity implements OnClickListener{
 		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 		screenHeight = displaymetrics.heightPixels;
 		screenWidth = displaymetrics.widthPixels;
-		Toast.makeText(getApplicationContext(), "width:"+screenWidth+"height:"+screenHeight, 500).show();
 	}
 }

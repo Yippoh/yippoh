@@ -9,6 +9,8 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jim.h.common.android.zxingjar.demo.getStoreDetails.LoadStore;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -32,9 +34,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -43,30 +47,51 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class getDetails extends Activity implements OnClickListener{
 	private JSONParser jsonParser;
-	private static String apiCallURL = "http://115.112.70.158/barcode_stats/ajax.php";
+	private static String apiCallURL = "http://115.112.70.158/barcode_stats/getdetails.php";
 	private static String jsonResult = "success";
 	private TextView formatTxt, contentTxt,ProductDet,Results,AddressTxt,LocPriceTxt,LocationDetLbl;
-	private EditText PriceTxt;
+	private LinearLayout linearErrorMsg;
+	private EditText PriceTxt,StoreName;
 	private Button getDetBtn;
 	ProgressDialog progDialog;
 	private int progressBarStatus = 0;
+	private ScrollView mScrollView;
 	private Handler progressBarHandler = new Handler();
 	private Spinner priceType,quantity;
 	boolean didItWork=false;
-	String Price,Barcode,lat,lon,deviceId,Type,Quant;
-
+	String Price,Barcode,lat,lon,deviceId,Type,Quant,StoreValue;
+	Integer screenHeight,screenWidth;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.get_details);
+		getScreenDimensions();
+		 if (screenHeight >480)
+		  {
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.my_title);	
+		  }
+		  else
+		  {
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.small_my_title);	
+		  }
 		
+//		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.my_title);	
+		findViewById(R.id.logo_btn).setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,	KeyEvent.KEYCODE_BACK));
+					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
+				}
+			});
 		jsonParser = new JSONParser();
 		contentTxt = (TextView)findViewById(R.id.scan_content);
 		ProductDet=(TextView)findViewById(R.id.ProductDet);
@@ -74,14 +99,26 @@ public class getDetails extends Activity implements OnClickListener{
 		LocPriceTxt=(TextView)findViewById(R.id.LocPriceTxt);
 		LocationDetLbl=(TextView)findViewById(R.id.LocationDetLbl);
 		Results=(TextView)findViewById(R.id.Results);
+		StoreName=(EditText)findViewById(R.id.StoreName);
 		PriceTxt =(EditText)findViewById(R.id.txtPrice); 
 		getDetBtn =(Button)findViewById(R.id.get_details_btn);
 		priceType=(Spinner)findViewById(R.id.priceTypeText);
 		quantity=(Spinner)findViewById(R.id.productquaTxt);
+		linearErrorMsg=(LinearLayout)findViewById(R.id.linearErrorMsg);
+		mScrollView=(ScrollView)findViewById(R.id.scroll_view);
+		linearErrorMsg.setVisibility(View.GONE);
 		receiveIntentValues();
 		getDetBtn.setOnClickListener(this);
 		}
 		
+	 public void getScreenDimensions()
+	 {
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+		screenHeight = displaymetrics.heightPixels;
+		screenWidth = displaymetrics.widthPixels;
+//		Toast.makeText(getApplicationContext(), "width:"+screenWidth+",height:"+screenHeight, 500).show();
+	 }
 	public void receiveIntentValues() {
 		// get Intent values
 		Intent getDet=getIntent();
@@ -103,10 +140,13 @@ public class getDetails extends Activity implements OnClickListener{
 		switch(v.getId()) {
 		
 		case R.id.get_details_btn:
-			
+			linearErrorMsg.setVisibility(View.GONE);
 			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(PriceTxt.getWindowToken(), 0);
+			InputMethodManager imm1 = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(StoreName.getWindowToken(), 0);
 			Results.setText("");
+			StoreValue=StoreName.getText().toString();
 			Price = PriceTxt.getText().toString();
 			Barcode = contentTxt.getText().toString();
 			Type=String.valueOf(priceType.getSelectedItem());	
@@ -114,148 +154,37 @@ public class getDetails extends Activity implements OnClickListener{
 			if(Price.length() == 0)
 			{
 				PriceTxt.setError(Html.fromHtml("<font color='red'>Price is required!</font>"));
-//				setColorText();   
 				didItWork=false;
 			}
 			else
 			{
 				didItWork=true;
 			}
-			if((didItWork))
+			
+			if(StoreValue.length()==0)
 			{
-				ShowProgressBar();
-				getDetailsDelay();
-				Toast.makeText(getApplicationContext(), "values passed to server:"+ Price +","+ Barcode+","+Type+","+Quant+","+deviceId, 300).show();
-				JSONObject json = getProductDetails(Price,Barcode,lat,lon,deviceId,Type,Quant);
-//				Toast.makeText(getApplicationContext(), "json:"+json, 500).show();
-				if(json!=null)
-				{
-					HideProgressBar();
-				  try 
-				  {
-						String message = json.getString("message");
-						ProductDet.setText("");
-						Results.setText("");
-//						Toast.makeText(getApplicationContext(), "message:"+message, 500).show();
-						if(message.equalsIgnoreCase("Barcode Not Exist")==true)
-						{
-							Toast.makeText(getApplicationContext(), "No Data Found ...", 1000).show();
-							ProductDet.postDelayed(new Runnable() {
-							    public void run() {
-							    	ProductDet.setText("Product Details:");
-							    }
-							}, 2000);
-							
-							Results.postDelayed(new Runnable() {
-							    public void run() {
-							    	Results.setText("We do not have any price data for that item within 50 miles");
-							    }
-							}, 2000);
-//							ProductDet.setText("Product Details:");
-//							Results.setText("We do not have any price data for that item within 50 miles");
-							return;
-						}
-						else
-						{
-							String ProductId="",ProductName="",ProductPrice="",ProductManu="",ProductBarCode="",locationValue="",locationAddress="",locationPrice="";	
-							ProductId=json.getString("id");
-							ProductName=json.getString("name");
-							ProductPrice=json.getString("price");
-							ProductManu=json.getString("manufacture");
-							ProductBarCode= json.getString("barcode");
-							Toast.makeText(getApplicationContext(), "ProductId:"+ProductId, 1000).show();
-							if(ProductId!="null")
-							{
-//								ProductDet.setText("Product Details:");
-//								Results.setText("Product Id:"+ProductId+",\n"+"ProductName:"+ProductName+",\n"+"Manufacturer:"+ProductManu+",\n"+"BarCode:"+ProductBarCode+",\n"+"Price:"+ProductPrice);
-								if(json.getString("other_locations")!="null")
-								{
-									
-								JSONArray productArray = new JSONArray(json.getString("other_locations"));
-								if(productArray.length()>0)
-								{
-									for (int i=0; i<productArray.length(); i++)
-								        {
-											JSONObject c= productArray.getJSONObject(i);
-//											Toast.makeText(getApplicationContext(),"Address:"+c.getString("address"),400).show();
-											
-									        if(c.getString("address")!="null" && c.getString("price")!="null")
-									        {
-									        	locationAddress+= c.getString("address")+"%";
-									        	locationPrice+=c.getString("price")+"%";
-									        	locationValue+="Address:"+c.getString("address")+",\nPrice:"+c.getString("price")+"\n\n";
-									        }
-									        else
-									        {
-									        	locationValue="";
-									        	locationAddress="";
-									        	locationPrice="";
-//									        	Toast.makeText(getApplicationContext(), "We do not have any price data for that item within 50 miles", 2000).show();
-//												ProductDet.postDelayed(new Runnable() {
-//												    public void run() {
-//												    	ProductDet.setText("Product Details:");
-//												    }
-//												}, 2000);
-//												
-//												Results.postDelayed(new Runnable() {
-//												    public void run() {
-//												    	Results.setText("We do not have any price data for that item within 50 miles");
-//												    }
-//												}, 2000);
-//												locationValue+="No Data Found";
-									        	
-									        }
-				
-										}
-								}
-								
-								
-								}
-								else
-						        {
-									locationValue="null";
-									locationAddress="null";
-						        	locationPrice="null";
-//									Toast.makeText(getApplicationContext(), "We do not have any price data for that item within 50 miles", 2000).show();
-//									ProductDet.postDelayed(new Runnable() {
-//									    public void run() {
-//									    	ProductDet.setText("Product Details:");
-//									    }
-//									}, 2000);
-//									
-//									Results.postDelayed(new Runnable() {
-//									    public void run() {
-//									    	Results.setText("We do not have any price data for that item within 50 miles");
-//									    }
-//									}, 2000);
-//									locationValue+="No Data Found";
-						        }							
-//								LocationDetLbl.setText("Location Details:");
-								AddressTxt.setText(locationAddress);
-								LocPriceTxt.setText(locationPrice);
-								Intent showDetails=new Intent(this,showDetails.class);
-								showDetails.putExtra("ProductId",ProductId);
-								showDetails.putExtra("ProductName", ProductName);
-								showDetails.putExtra("Manufac", ProductManu);
-								showDetails.putExtra("BarCode", ProductBarCode);
-								showDetails.putExtra("ProductPrice", ProductPrice);
-								showDetails.putExtra("locationValue", locationValue);
-								showDetails.putExtra("Address", locationAddress);
-								showDetails.putExtra("Price", locationPrice);
-								startActivity(showDetails);
-						}
-					}
-				  }
-					catch (JSONException e) {
-						e.printStackTrace();
-					}
-				}
-				
-				
+				StoreName.setError(Html.fromHtml("<font color='red'>Store Name required!</font>"));
+				didItWork=false;
 			}
 			else
 			{
-				 Toast.makeText(getApplicationContext(), "Enter the Price", 300).show();
+				didItWork=true;
+			}
+			
+			if((didItWork))
+			{
+//				Toast.makeText(getApplicationContext(), "values passed to server:"+ Price +","+ Barcode+","+Type+","+Quant+","+deviceId+","+StoreValue, 1000).show();
+				new LoadProducts().execute(" ");				
+			}
+			else
+			{
+				Results.setText("Enter the Price & Store Name");
+				linearErrorMsg.setVisibility(View.VISIBLE);
+				mScrollView.post(new Runnable() { 
+			        public void run() { 
+			             mScrollView.scrollTo(0, mScrollView.getBottom());
+			        } 
+			    });
 			}
 		   break;
 		}
@@ -266,49 +195,116 @@ public class getDetails extends Activity implements OnClickListener{
 //		PriceTxt.setTextColor(Color.RED);
 //	}
 
-	public void ShowProgressBar()
-	{
-		 progDialog = new ProgressDialog(this);
-         progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-         progDialog.setMessage("Loading...");
-         progDialog.setProgress(0);
-         progDialog.setMax(100);
-         progDialog.show();
-         progressBarStatus = 0;
-	}
 	
-	public void getDetailsDelay()
-	{
-		new Thread(new Runnable() {
-			  public void run() {
-					  // your computer is too fast, sleep 5 second
-					  try {
-						Thread.sleep(5000);
-		
-					  } catch (InterruptedException e) {
-						e.printStackTrace();
-					  }
-					  }
-			       }).start();
-	}
-	
-	public void HideProgressBar()
-	{
-		 new Thread(new Runnable() {
-			  public void run() {
-						// sleep 5 seconds, so that you can see the 100%
-						try {
-							Thread.sleep(100);
-							// close the progress bar dialog
-							progDialog.dismiss();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						}
-			  }).start();
-	}
-	
-	public JSONObject getProductDetails(String Price,String Barcode,String lat,String lon,String deviceId,String Type,String Quant){
+	 public class LoadProducts extends AsyncTask<String,Integer,String>{
+	        ProgressDialog dialog;
+	        protected void onPreExecute(){
+	            dialog = new ProgressDialog(getDetails.this);            
+	                            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+	            dialog.setMax(100);
+	            dialog.setMessage("Loading...");
+	            dialog.show();              
+	        }
+	        @Override
+	        protected String doInBackground(String... arg0) {
+	                for(int i=0;i<6;i++){
+	                publishProgress(5);
+	                try {
+	                    Thread.sleep(500);// the timing set to a large value
+	                } catch (InterruptedException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	            dialog.dismiss();
+	            return null;
+	        }
+	    protected void  onProgressUpdate(Integer...progress){
+	        dialog.incrementProgressBy(progress[0]);
+	    }
+	        protected void onPostExecute(String result){
+	        	JSONObject jsonPro = getProductDetails(Price,Barcode,lat,lon,deviceId,Type,Quant,StoreValue);
+	        	if(jsonPro!=null)
+				{
+				try 
+				{
+				String message = jsonPro.getString("message");
+				if(message.equalsIgnoreCase("Barcode Not Exist")==true)
+				{
+					  	ProductDet.setText("Product Details:");
+				    	Results.setText("We do not have any price data for that item within 50 miles");
+ 					    linearErrorMsg.setVisibility(View.VISIBLE);
+ 						return;
+				}
+				else
+				{
+				String ProductId="",ProductName="",ProductPrice="",ProductManu="",ProductBarCode="",locationValue="",locationAddress="",locationPrice="";	
+				ProductId=jsonPro.getString("id");
+				ProductName=jsonPro.getString("name");
+				ProductPrice=jsonPro.getString("price");
+				ProductManu=jsonPro.getString("manufacture");
+				ProductBarCode= jsonPro.getString("barcode");
+				
+				if(ProductId!="null")
+				{
+					if(jsonPro.getString("other_locations")!="null")
+				{
+					
+				JSONArray productArray = new JSONArray(jsonPro.getString("other_locations"));
+				if(productArray.length()>0)
+				{
+					for (int i=0; i<productArray.length(); i++)
+				        {
+							JSONObject c= productArray.getJSONObject(i);
+//							Toast.makeText(getApplicationContext(), "address:"+ c.getString("address"), 500).show();
+							 if(c.getString("address")!="null" && c.getString("price")!="null")
+					        {
+					        	locationAddress+= c.getString("address")+"%";
+					        	locationPrice+=c.getString("price")+"%";
+					        	locationValue+="Address:"+c.getString("address")+",\nPrice:"+c.getString("price")+"\n\n";
+					        }
+					        else
+					        {
+					        	locationValue="";
+					        	locationAddress="";
+					        	locationPrice="";
+							    }
+									
+							}
+					}
+					
+					
+					}
+					else
+					{
+						locationValue="null";
+						locationAddress="null";
+						locationPrice="null";
+					}
+					AddressTxt.setText(locationAddress);
+					LocPriceTxt.setText(locationPrice);
+					final Intent showDetails=new Intent(getDetails.this,showDetails.class);
+					showDetails.putExtra("ProductId",ProductId);
+					showDetails.putExtra("ProductName", ProductName);
+					showDetails.putExtra("Manufac", ProductManu);
+					showDetails.putExtra("BarCode", ProductBarCode);
+					showDetails.putExtra("ProductPrice", ProductPrice);
+					showDetails.putExtra("locationValue", locationValue);
+					showDetails.putExtra("Address", locationAddress);
+					showDetails.putExtra("Price", locationPrice);
+					startActivity(showDetails);
+					
+				}
+				}
+				}
+				catch (JSONException e) {
+				e.printStackTrace();
+				}
+				}
+				
+	        }
+	    }
+
+	public JSONObject getProductDetails(String Price,String Barcode,String lat,String lon,String deviceId,String Type,String Quant,String StoreValue){
 		 
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("price", Price));
@@ -318,6 +314,7 @@ public class getDetails extends Activity implements OnClickListener{
         params.add(new BasicNameValuePair("device_id",deviceId));
         params.add(new BasicNameValuePair("type",Type));
         params.add(new BasicNameValuePair("quant",Quant));
+        params.add(new BasicNameValuePair("storename",StoreValue));
         JSONObject json = getJSONFromUrl(apiCallURL, params);
         return json;
     }
@@ -331,21 +328,14 @@ public class getDetails extends Activity implements OnClickListener{
 	        	ProductDet.setText("");
 	        	Results.setText("");
 	        	if(!isConnected(getDetails.this)){
-	        		HideProgressBar();
-		        	Toast.makeText(getApplicationContext(), "Check your internet connection", 1000).show();
-//		        	ProductDet.setText("Product Details:");
-//					Results.setText("Check your Internet connection");
-					ProductDet.postDelayed(new Runnable() {
-					    public void run() {
-					    	ProductDet.setText("Product Details:");
-					    }
-					}, 2000);
-					
-					Results.postDelayed(new Runnable() {
-					    public void run() {
-					    	Results.setText("Check your internet connection");
-					    }
-					}, 2000);
+	        		ProductDet.setText("Product Details:");
+					Results.setText("Check your internet connection");
+					linearErrorMsg.setVisibility(View.VISIBLE);
+					mScrollView.post(new Runnable() { 
+				        public void run() { 
+				             mScrollView.scrollTo(0, mScrollView.getBottom());
+				        } 
+				    });
 		        	return null;
 		        }
 	            DefaultHttpClient httpClient = new DefaultHttpClient();

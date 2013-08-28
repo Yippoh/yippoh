@@ -42,6 +42,7 @@ public class Splash extends Activity {
                 	Intent tab = new Intent(Splash.this,TabHostActivity.class);
                 	tab.putExtra("device_id", DeviceId);
         		    startActivity(tab);
+        		    finish();
 //                	Intent checkDeviceId = new Intent(Splash.this,CheckDeviceId.class);
 //                	checkDeviceId.putExtra("device_id", DeviceId);
 //					startActivity(checkDeviceId);

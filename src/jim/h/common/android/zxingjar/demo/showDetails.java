@@ -12,6 +12,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -28,16 +30,25 @@ public class showDetails extends Activity implements OnClickListener{
 	private Handler handler = new Handler();
 	private TextView productTxt,productNameTxt,productPriceTxt,productManuTxt,productBarcodeTxt,msgLbl,LocationDetlbl;
 	private TableLayout table;
-	private Button scanButton;
+	private Button scanButton,homeButton;
+	private LinearLayout linearErrorMsg;
 	String ProductId,productName,productPrice,productManu,Barcode,Address,Price,locationValue,lat,lon,DeviceId;
-  
+    Integer screenHeight,screenWidth;
 	String[] locAddress=null;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.show_details);
-		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.my_title);	
+		getScreenDimensions();
+		 if (screenHeight >480)
+		  {
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.my_title);	
+		  }
+		  else
+		  {
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.small_my_title);	
+		  }
 		findViewById(R.id.logo_btn).setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,	KeyEvent.KEYCODE_BACK));
@@ -52,15 +63,26 @@ public class showDetails extends Activity implements OnClickListener{
 		productBarcodeTxt=(TextView)findViewById(R.id.productBarcodeTxt);
 		LocationDetlbl=(TextView)findViewById(R.id.LocationDetlbl);
 		scanButton=(Button)findViewById(R.id.scan_button);
+		homeButton=(Button)findViewById(R.id.home_button);
 		msgLbl=(TextView)findViewById(R.id.msgLbl);
 		table=(TableLayout)findViewById(R.id.LocationDetailsTbl);
+		linearErrorMsg=(LinearLayout)findViewById(R.id.linearErrorMsg);
+		linearErrorMsg.setVisibility(View.GONE);
 		table.setVisibility(View.GONE);
 		scanButton.setOnClickListener(this);
+		homeButton.setOnClickListener(this);
 		setInfoByView();
 		getLocation();
 		getDeviceId();
 	}
-	
+	 public void getScreenDimensions()
+	 {
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+		screenHeight = displaymetrics.heightPixels;
+		screenWidth = displaymetrics.widthPixels;
+//		Toast.makeText(getApplicationContext(), "width:"+screenWidth+",height:"+screenHeight, 500).show();
+	 }
 
 	public void receiveProductDetails()
 	{
@@ -82,6 +104,11 @@ public class showDetails extends Activity implements OnClickListener{
 		case R.id.scan_button:
 			IntentIntegrator.initiateScan(this, R.layout.capture,
 	                R.id.viewfinder_view, R.id.preview_view, false);
+			break;
+		case R.id.home_button:
+			Intent tab = new Intent(showDetails.this,TabHostActivity.class);
+        	tab.putExtra("device_id", DeviceId);
+		    startActivity(tab);
 			break;
 		}
 	}
@@ -135,7 +162,7 @@ public class showDetails extends Activity implements OnClickListener{
 			   table.setVisibility(View.GONE);
 			   LocationDetlbl.setVisibility(View.VISIBLE);
 			   LocationDetlbl.setText("Location Details:");
-			   msgLbl.setVisibility(View.VISIBLE);
+			   linearErrorMsg.setVisibility(View.VISIBLE);
 			   msgLbl.setText("No Data Found");
 		   }
 		   else
@@ -143,7 +170,7 @@ public class showDetails extends Activity implements OnClickListener{
 			   LocationDetlbl.setVisibility(View.VISIBLE);
 			   LocationDetlbl.setText("Location Details:");
 			   table.setVisibility(View.VISIBLE);
-			   msgLbl.setVisibility(View.GONE);
+			   linearErrorMsg.setVisibility(View.GONE);
 			   TableLayout myTableLayout = null;
 			    myTableLayout = (TableLayout)findViewById(R.id.LocationDetailsTbl);
 			    locAddress=Address.split("%");

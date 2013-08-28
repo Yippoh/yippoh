@@ -23,14 +23,16 @@
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="proName">Name</string>
-    <string name="histroy">Histroy Details:</string>
-    <string name="Rewards">Rewards:</string>
-     <string name="storeName">Store Name</string>
+    <string name="histroy">Histroy Details</string>
+    <string name="Rewards">Rewards</string>
+     <string name="storeName">Enter Store:</string>
      <string name="Cancel">Cancel</string>
      <string name="LocationName">Where you are at?</string>
      <string name="StoreTitle">Select store you are in</string>
      <string name="redeem">Redeem</string>
-     <string name="lblEmail">Please Provide Email:</string>
+     <string name="lblEmail">Provide Your Email Id</string>
+     <string name="home">Home</string>
+     <string name="loadMore">Load More ...</string>
     <!-- Price Type -->
     <string-array name="price_type_list">
         <item>Regular</item>

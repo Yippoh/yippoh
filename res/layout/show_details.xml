@@ -26,6 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/title"
+        android:layout_margin="5dp"
             />
     <ImageView 
          android:id="@+id/imageLine"
@@ -34,7 +35,7 @@
         android:src="@drawable/line"
         android:layout_below="@+id/Txttitle"
          android:layout_marginTop="10dp"
-         android:layout_marginLeft="2dp"
+         android:layout_marginLeft="5dp"
         />
         
         
@@ -284,54 +285,74 @@
 
 			 </TableLayout>
     	 
-    	  <LinearLayout
-                android:id="@+id/linearLayout7"
-                android:layout_marginTop="10dip"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:orientation="horizontal"
-                android:padding="5dp" 
-                
-               >
-				<TextView
-				android:id="@+id/msgLbl"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_weight="0.03"
-				android:textSize="14sp"
-				android:textStyle="bold"
-				android:text=""
-				android:visibility="gone"
-				android:gravity="center"
-			    />
-				</LinearLayout>
     	 
+     <LinearLayout
+			       android:id="@+id/linearErrorMsg"
+			       android:layout_width="wrap_content"
+			       android:layout_height="wrap_content"
+			       android:layout_marginLeft="10dp"
+			       android:orientation="horizontal"
+			       android:layout_marginTop="5dp"
+			       android:padding="5dp" 
+			       android:visibility="gone"
+			       android:layout_below="@+id/ProductDet"
+			       android:background="@layout/error"
+			       >	
+	 <ImageView 
+         android:id="@+id/warningimg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/warning"
+         android:layout_margin="5dp"
+        />
+	   <TextView
+	    	    android:id="@+id/msgLbl"
+	    	    android:layout_height="wrap_content"
+	    	    android:layout_width="wrap_content"
+	    	    android:layout_marginTop="10dp"
+	    	    android:layout_marginLeft="5dp"
+	    	    android:layout_marginBottom="5dp"
+	    	    android:layout_marginRight="5dp"   	
+	    	    android:textSize="14sp"   
+		        android:text=""
+		      	    	    />
+	   </LinearLayout>
    </LinearLayout>
 </LinearLayout>
 
 </ScrollView>
-<RelativeLayout android:id="@+id/myFooter"
+ <RelativeLayout android:id="@+id/myFooter"
         android:layout_alignParentBottom="true" android:layout_height="65dp"
         android:layout_width="fill_parent"
-        android:background="#848484">
+        android:background="#C2C2C2">
         <Button
         android:id="@+id/scan_button"
-        android:layout_width="160dp"
+        android:layout_width="130dp"
         android:layout_height="60dp"
-        android:layout_centerHorizontal="true"
-		android:text="@string/scan"
+        android:text="@string/scan"
 		android:gravity="left"
- 		android:drawablePadding="15dp"
+ 		android:drawablePadding="12dp"
  		android:drawableLeft="@drawable/scan_icon"
 	    android:background="@layout/button_style"
 	    android:textColor="#FFFFFF"
 	    android:textSize="20sp"
 	    android:paddingTop="15dp"
 	    android:paddingBottom="0dp"
-	    android:paddingRight="26dip"
+	    android:paddingRight="5dip"
         android:singleLine="true"
         android:layout_centerVertical="true"
-    	         />
+        android:layout_marginLeft="5dp"
+           	         />
+         <Button
+        android:id="@+id/home_button"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:text="@string/home"
+	    android:background="@layout/button_style"
+	    android:textColor="#FFFFFF"
+	    android:textSize="20sp"
+	    android:layout_marginLeft="140dp"
+	   	android:layout_centerVertical="true"
+	        	         />
     </RelativeLayout>
 </RelativeLayout>

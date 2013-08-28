@@ -52,7 +52,7 @@
          					        						/>	
 				</LinearLayout>  
   <TableLayout
- 	     	android:layout_width="315dp"
+ 	     	android:layout_width="fill_parent"
     	    android:layout_marginLeft="2dp"
     	    android:layout_marginRight="2dp"
 			android:layout_height="fill_parent"
@@ -63,8 +63,7 @@
 						>
 				<TableRow
 				    android:background="@layout/table_row"	
-				    android:layout_margin="2dp"	
-				        >
+				    				        >
 				        
 				    <TextView
 				            android:text="@string/proName"
@@ -100,31 +99,38 @@
 				</TableRow>
 			
 				</TableLayout>
-			
-				<LinearLayout
-	                android:id="@+id/linearLayout2"
-	                android:layout_marginTop="10dip"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_marginLeft="5dp"
-	                android:orientation="horizontal"
-	                android:padding="5dp" 
-                    android:layout_below="@+id/linearLayout1"
-               	>
 				
-				    
-						<TextView
-						android:id="@+id/msgLbl"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:layout_weight="0.03"
-						android:textSize="14sp"
-						android:textStyle="bold"
-						android:text=""
-						android:visibility="gone"
-						android:gravity="center"
-					    />
-				</LinearLayout>
+				 <LinearLayout
+			       android:id="@+id/linearErrorMsg"
+			       android:layout_width="wrap_content"
+			       android:layout_height="wrap_content"
+			       android:layout_marginLeft="25dp"
+			       android:orientation="horizontal"
+			       android:layout_marginTop="5dp"
+			       android:padding="5dp" 
+			       android:visibility="gone"
+			       android:layout_below="@+id/linearLayout2"
+			       android:background="@layout/error"
+			       >	
+					 <ImageView 
+				         android:id="@+id/warningimg"
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:src="@drawable/warning"
+				         android:layout_margin="5dp"
+				        />
+					   <TextView
+					    	    android:id="@+id/msgLbl"
+					    	    android:layout_height="wrap_content"
+					    	    android:layout_width="wrap_content"
+					    	    android:layout_marginTop="10dp"
+					    	    android:layout_marginLeft="5dp"
+					    	    android:layout_marginBottom="5dp"
+					    	    android:layout_marginRight="5dp"   	   
+						        android:text=""
+						      	    	    />
+  			 </LinearLayout>
+				
 				
      </LinearLayout>
      

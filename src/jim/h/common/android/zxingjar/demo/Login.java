@@ -24,14 +24,17 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -47,17 +50,42 @@ public class Login	extends Activity implements OnClickListener{
 	private EditText txtEmail;
 	private Button Submit;
 	String Email,DeviceId,lat,lon;
+	Integer screenHeight,screenWidth;
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		jsonParser = new JSONParser();
 		getDeviceId();
 		getLocation();
+		requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);	
 		setContentView(R.layout.login);
+		getScreenDimensions();
+		if(screenHeight >480)
+		  {
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.my_title);	
+		  }
+		  else
+		  {
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.small_my_title);	
+		  }
+		  findViewById(R.id.logo_btn).setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,	KeyEvent.KEYCODE_BACK));
+					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
+				}
+			});
 		txtEmail=(EditText)findViewById(R.id.txtEmail); 
 		lblMsg=(TextView)findViewById(R.id.lblMsg); 
 		Submit=(Button)findViewById(R.id.Submit); 
 		Submit.setOnClickListener(this);
 	}
+	public void getScreenDimensions()
+	 {
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+		screenHeight = displaymetrics.heightPixels;
+		screenWidth = displaymetrics.widthPixels;
+//		Toast.makeText(getApplicationContext(), "width:"+screenWidth+",height:"+screenHeight, 500).show();
+	 }
 	public void getDeviceId()
     {
     	

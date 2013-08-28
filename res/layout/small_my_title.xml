@@ -25,16 +25,19 @@
 		android:layout_width="22dp" android:layout_alignParentLeft="true"
 		android:layout_centerVertical="true"  android:id="@+id/logo_btn"
 		android:layout_height="22dp" 
-		android:layout_centerHorizontal="true"
+		
 		android:layout_margin="2dp"
+		
 		/>
 
 	<TextView android:id="@+id/title" android:layout_width="wrap_content"
-		android:gravity="center" android:textSize="16sp"
+		android:gravity="center" android:textSize="14sp"
 		android:textColor="#ffffff" android:layout_alignParentLeft="true"
 		android:text="@string/title" android:background="#4b9bfa"
 		android:layout_height="wrap_content" 
 		android:layout_centerHorizontal="true"
-								 />
+		
+		android:layout_margin="2dp"
+						 />
 	 </LinearLayout>
 </RelativeLayout>

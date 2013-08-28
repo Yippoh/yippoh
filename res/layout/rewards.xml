@@ -84,10 +84,44 @@
 						android:layout_height="wrap_content"
 						android:layout_weight="0.03"
 						android:textSize="14sp"
-						android:textStyle="bold"
+						android:textStyle="normal"
 						 android:layout_marginTop="20dp"
 						android:text=""
-						android:gravity="center"
+						android:gravity="left"
+						android:layout_marginLeft="5dp"
+						android:layout_marginRight="5dp"
 					    />
 				</LinearLayout>	
+				
+			 <LinearLayout
+			       android:id="@+id/linearErrorMsg"
+			       android:layout_width="wrap_content"
+			       android:layout_height="wrap_content"
+			       android:layout_marginLeft="25dp"
+			       android:orientation="horizontal"
+			       android:layout_marginTop="5dp"
+			       android:padding="5dp" 
+			       android:visibility="gone"
+			       android:layout_below="@+id/linearLayout2"
+			       android:background="@layout/error"
+			       >	
+			 	<ImageView 
+		         android:id="@+id/warningimg"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/warning"
+		         android:layout_margin="5dp"
+		        />
+			   	<TextView
+			    	    android:id="@+id/Results"
+			    	    android:layout_height="wrap_content"
+			    	    android:layout_width="wrap_content"
+			    	    android:layout_marginTop="10dp"
+			    	    android:layout_marginLeft="5dp"
+			    	    android:layout_marginBottom="5dp"
+			    	    android:layout_marginRight="5dp"   	   
+				        android:text=""
+				      	    	    />
+   				</LinearLayout>
+			 
 </RelativeLayout>

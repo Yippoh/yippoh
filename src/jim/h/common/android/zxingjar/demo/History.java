@@ -27,59 +27,49 @@ import android.content.Context;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class History extends Activity {
+public class History extends Activity implements OnClickListener{
 	
 	private static String apiCallURL = "http://115.112.70.158/barcode_stats/history.php";
 	ProgressDialog progDialog;
 	private int progressBarStatus = 0;
+	private LinearLayout linearErrorMsg;
 	String lat,lon,DeviceId;
 	private TableLayout history;
+	private Button load_more;
 	private TextView msgLbl;
 	String lblLatitude,lblLongitude,lblStoreName;
 	JSONArray histroyArray=null;
+	
+	int current_page = 1;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.history);
 		msgLbl=(TextView)findViewById(R.id.msgLbl);
-//		lblLatitude=(TextView)findViewById(R.id.lblLatitude);
-//		lblLongitude=(TextView)findViewById(R.id.lblLongitude);
-//		lblStoreName=(TextView)findViewById(R.id.lblStoreName);
-		
 		history=(TableLayout)findViewById(R.id.historyDetailsTbl);
+		linearErrorMsg=(LinearLayout)findViewById(R.id.linearErrorMsg);
 		history.setVisibility(View.GONE);
-		 getDeviceId();
- 		 getLocation();
- 		 ShowHistroy();
+		getDeviceId();
+ 		getLocation();
+ 		ShowHistroy();
+// 		load_more.setOnClickListener(this);
 	}
-	
-//	public void HideProgressBar()
-//	{
-//		 new Thread(new Runnable() {
-//			  public void run() {
-//						// sleep 5 seconds, so that you can see the 100%
-//						try {
-//							Thread.sleep(100);
-//							// close the progress bar dialog
-//							progDialog.dismiss();
-//						} catch (InterruptedException e) {
-//							e.printStackTrace();
-//						}
-//						}
-//			  }).start();
-//	}
 	public void getLocation()
 	{
 	    // GPSTracker class
@@ -95,9 +85,7 @@ public class History extends Activity {
 //	        Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, 800).show();    
 	        lat=String.valueOf(latitude);
 	        lon=String.valueOf(longitude);
-	        Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + lat + "\nLong: " + lon , 500).show();   
-	        
-	       
+	        	       
 	    }else{
 	        // can't get location
 	        // GPS or Network is not enabled
@@ -117,18 +105,15 @@ public class History extends Activity {
 		* for example,the IMEI for GSM and the MEID or ESN for CDMA phones.  
 		*/				    
 	     DeviceId = telephonyManager.getDeviceId();
-//	     Toast.makeText(getApplicationContext(), "DeviceId:" +DeviceId, 500).show();   
 	}
 	
 
 	public void ShowHistroy()
 	{
-//		HideProgressBar();
-		JSONObject json = getHistory(lat,lon,DeviceId);
+		String Page=String.valueOf("0");
+		JSONObject json = getHistory(lat,lon,DeviceId,Page);
 		if(json!=null)
 		{
-//			HideProgressBar();
-//			Toast.makeText(getApplicationContext(), "json:"+json, 1000).show();
 			try 
 			{
 				String message = json.getString("message");
@@ -136,12 +121,14 @@ public class History extends Activity {
 				{
 					 Toast.makeText(getApplicationContext(), "No Data Found", 500).show();
 					 history.setVisibility(View.GONE);
+					 linearErrorMsg.setVisibility(View.VISIBLE);
 					 msgLbl.setVisibility(View.VISIBLE);
 					 msgLbl.setText("No Data Found");
 				}
 				else
 				{
 					history.setVisibility(View.VISIBLE);
+					linearErrorMsg.setVisibility(View.GONE);
 					msgLbl.setVisibility(View.GONE);
 					if(json.getString("history")!="null")
 					{
@@ -169,8 +156,10 @@ public class History extends Activity {
 							    }
 								 history.addView(myTableRow);
 								 history.addView(createImageView());
+								
 						    }
 						}
+						
 					}
 					else
 					{
@@ -180,7 +169,7 @@ public class History extends Activity {
 					}
 					
 				}
-			  
+				history.addView(createLoadMore());
 			}
 			catch (JSONException e) {
 				e.printStackTrace();
@@ -231,6 +220,139 @@ public class History extends Activity {
 		tv_name.setGravity(Gravity.LEFT);
 		return tv_name;
 	}
+	private View createLoadMore() {
+		// TODO Auto-generated method stub
+		load_more=new Button(this);
+		load_more.setBackgroundResource(R.layout.green_btn);
+		load_more.setWidth(100);
+		load_more.setPadding(10, 10, 5, 20);
+		load_more.setText("Load More ...");
+		load_more.setTextSize(16);
+		load_more.setTextColor(Color.WHITE);
+		load_more.setGravity(Gravity.CENTER);
+		load_more.setOnClickListener(this);
+		return load_more;
+	}
+	
+	 public void onClick(View arg0) {
+		 new loadMore().execute();
+	  }
+	
+	
+	 public class loadMore extends AsyncTask<String,Integer,String>{ 
+		 ProgressDialog dialog;
+	        protected void onPreExecute(){
+	            dialog = new ProgressDialog(History.this);            
+	                            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+	            dialog.setMax(100);
+	            dialog.setTitle("Please Wait");
+	            dialog.setMessage("Loading...");
+	            dialog.show();              
+	        }
+	        @Override
+	        protected String doInBackground(String... arg0) {
+	                for(int i=0;i<6;i++){
+	                publishProgress(5);
+	                try {
+	                    Thread.sleep(1000);// the timing set to a large value
+	                } catch (InterruptedException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	            dialog.dismiss();
+	            return null;
+	        }
+	    protected void  onProgressUpdate(Integer...progress){
+	        dialog.incrementProgressBy(progress[0]);
+	    }
+	        protected void onPostExecute(String result){
+	        	TableRow loadMoreRow =null;
+//	        	Toast.makeText(getApplicationContext(), "load more", 500).show();
+	        	String Page=String.valueOf(current_page);
+	        	JSONObject json = getHistory(lat,lon,DeviceId,Page);
+	    		if(json!=null)
+	    		{
+	    			try 
+	        		{
+	    			String message = json.getString("message");
+					if(message.equalsIgnoreCase("No Data Found")==true)
+					{
+						load_more.setVisibility(View.GONE);
+		        		history.addView(createLoadMoreMsg());
+					}
+					else
+					{
+		        	if(current_page<=3)
+		        	{   		
+//	        	Toast.makeText(getApplicationContext(), "page:"+Page, 500).show();
+		        		
+		        			load_more.setVisibility(View.GONE);
+	
+//	    				Toast.makeText(getApplicationContext(), "json:"+json, 500).show();
+		        			JSONArray loadMoreHistoryArray= new JSONArray(json.getString("history"));
+		        			if(loadMoreHistoryArray.length()>0)
+		        			{
+		        				int count =0;
+		        				for (int i=0; i<loadMoreHistoryArray.length(); i++)
+		        				{
+		        					count=count+1;
+		        					JSONObject c= loadMoreHistoryArray.getJSONObject(i);
+		        					loadMoreRow= new TableRow(History.this);
+		        					loadMoreRow.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+							     // Add name
+		        					loadMoreRow.addView(createTextView(c.getString("product_name")));
+		        					loadMoreRow.addView(createTextView(c.getString("latitude")));
+		        					loadMoreRow.addView(createTextView(c.getString("longitude")));
+								
+		        					if(count%2!=0){
+									 loadMoreRow.setBackgroundColor(Color.parseColor("#F2F2F2"));
+		        					}
+		        					else
+		        					{
+							    	loadMoreRow.setBackgroundColor(Color.parseColor("#D2D2D2"));
+		        					}
+		        					history.addView(loadMoreRow);
+		        					history.addView(createImageView());
+								
+		        				}
+//							load_more.setVisibility(View.VISIBLE);
+		        			}
+		        		
+	    			history.addView(createLoadMore());
+	    			current_page += 1;
+		        	}
+		        	else
+		        	{
+		        		load_more.setVisibility(View.GONE);
+		        		history.addView(createLoadMoreMsg());
+//	    			Toast.makeText(getApplicationContext(), "No Values Returned", 500).show();
+		        	}
+					}
+	        		} 
+	        		catch (JSONException e) {
+    				e.printStackTrace();
+	        		}
+	    		
+	    		}
+	        	else
+	        	{
+	    			Toast.makeText(getApplicationContext(), "No Values Returned", 500).show();
+	        		load_more.setVisibility(View.GONE);
+	        		history.addView(createLoadMoreMsg());
+	        	}
+	        }
+	 }
+	 public View createLoadMoreMsg() {
+			// TODO Auto-generated method stub
+			TextView msg =new TextView(this);
+			msg.setText("No more data found ...");
+			msg.setTextSize(16);
+			msg.setWidth(200);
+			msg.setPadding(5, 5, 5, 5);
+			msg.setGravity(Gravity.CENTER);
+			return msg;
+		}
+	
 	private View createImageView() {
 		// TODO Auto-generated method stub
 		ImageView img_name =new ImageView(this);
@@ -239,12 +361,24 @@ public class History extends Activity {
 		img_name.setPadding(5, 0, 0, 0);
 		return img_name;
 	}
-	public JSONObject getHistory(String lat, String lon, String deviceId) {
+//	public JSONObject getLoadMoreHistory(String lat, String lon, String deviceId,String page) {
+//		// TODO Auto-generated method stub
+//		List<NameValuePair> params = new ArrayList<NameValuePair>();
+//		params.add(new BasicNameValuePair("device_id",deviceId));
+//        params.add(new BasicNameValuePair("lat",lat));
+//        params.add(new BasicNameValuePair("lon",lon));
+//        params.add(new BasicNameValuePair("page",page));
+//        JSONObject json = getJSONFromUrl(apiCallURL, params);
+//        return json;
+//	}
+	
+	public JSONObject getHistory(String lat, String lon, String deviceId,String page) {
 		// TODO Auto-generated method stub
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("device_id",deviceId));
         params.add(new BasicNameValuePair("lat",lat));
         params.add(new BasicNameValuePair("lon",lon));
+        params.add(new BasicNameValuePair("page",page));
         JSONObject json = getJSONFromUrl(apiCallURL, params);
         return json;
 	}
@@ -268,7 +402,8 @@ public class History extends Activity {
 		        try {
 		        	if(!isConnected(History.this))
 		        	{
-		        		Toast.makeText(getApplicationContext(), "Check your Internet connection", 1000).show();
+//		        		Toast.makeText(getApplicationContext(), "Check your Internet connection", 1000).show();
+		        		linearErrorMsg.setVisibility(View.VISIBLE);
 		        		msgLbl.setVisibility(View.VISIBLE);
 		    			msgLbl.setText("Check your Internet connection");
 		        		
