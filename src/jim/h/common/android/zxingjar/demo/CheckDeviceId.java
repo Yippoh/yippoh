@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 public class CheckDeviceId extends Activity {
 //	private JSONParser jsonParser;
-//	private static String UserURL = "http://115.112.70.158/barcode_stats/user.php";
+	private static String UserURL = "http://115.112.70.158/barcode_stats/user.php";
 	String DeviceId,lat,lon;
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,7 +45,7 @@ public class CheckDeviceId extends Activity {
 //    			Intent Scan = new Intent(this,Scan.class);
 //    		    startActivity(Scan);
     			Intent getDet = new Intent(this,getDetails.class);
-				getDet.putExtra("BarCode", "W1LS2M");
+				getDet.putExtra("BarCode", "72225210200");
 				getDet.putExtra("format", "QR_CODE");
 				getDet.putExtra("lat", lat);
 				getDet.putExtra("lon", lon);
@@ -69,7 +69,7 @@ public class CheckDeviceId extends Activity {
 //    				Intent Scan = new Intent(this,Scan.class);
 //        		    startActivity(Scan);
     				Intent getDet = new Intent(this,getDetails.class);
-    				getDet.putExtra("BarCode", "W1LS2M");
+    				getDet.putExtra("BarCode", "72225210200");
     				getDet.putExtra("format", "QR_CODE");
     				getDet.putExtra("lat", lat);
     				getDet.putExtra("lon", lon);
@@ -100,7 +100,7 @@ public class CheckDeviceId extends Activity {
    	 	String log =null;
        for (Contact cn : contacts) {
        	log= "\nId: "+cn.getID()+" ,\nName: " + cn.getDeviceID() + " ,\nEmail:"+cn.getEmailID()+"\nCount: " + cn.getCount();
-//       	Toast.makeText(getApplicationContext(), "details saved:" +log, 1000).show();
+       	Toast.makeText(getApplicationContext(), "details saved:" +log, 1000).show();
        }
 
 	}

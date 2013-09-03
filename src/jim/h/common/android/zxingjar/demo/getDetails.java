@@ -5,27 +5,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
-
-import jim.h.common.android.zxingjar.demo.getStoreDetails.LoadStore;
+import jim.h.common.android.zxinglib.integrator.IntentIntegrator;
+import jim.h.common.android.zxinglib.integrator.IntentResult;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -55,13 +60,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class getDetails extends Activity implements OnClickListener{
+	private Handler handler = new Handler();
 	private JSONParser jsonParser;
 	private static String apiCallURL = "http://115.112.70.158/barcode_stats/getdetails.php";
 	private static String jsonResult = "success";
 	private TextView formatTxt, contentTxt,ProductDet,Results,AddressTxt,LocPriceTxt,LocationDetLbl;
 	private LinearLayout linearErrorMsg;
 	private EditText PriceTxt,StoreName;
-	private Button getDetBtn;
+	private Button getDetBtn,scanButton,homeButton;
 	ProgressDialog progDialog;
 	private int progressBarStatus = 0;
 	private ScrollView mScrollView;
@@ -84,9 +90,7 @@ public class getDetails extends Activity implements OnClickListener{
 		  {
 			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.small_my_title);	
 		  }
-		
-//		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.my_title);	
-		findViewById(R.id.logo_btn).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.linear_back_btn).setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,	KeyEvent.KEYCODE_BACK));
 					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
@@ -102,6 +106,8 @@ public class getDetails extends Activity implements OnClickListener{
 		StoreName=(EditText)findViewById(R.id.StoreName);
 		PriceTxt =(EditText)findViewById(R.id.txtPrice); 
 		getDetBtn =(Button)findViewById(R.id.get_details_btn);
+		scanButton=(Button)findViewById(R.id.scan_button);
+		homeButton=(Button)findViewById(R.id.home_button);
 		priceType=(Spinner)findViewById(R.id.priceTypeText);
 		quantity=(Spinner)findViewById(R.id.productquaTxt);
 		linearErrorMsg=(LinearLayout)findViewById(R.id.linearErrorMsg);
@@ -109,6 +115,8 @@ public class getDetails extends Activity implements OnClickListener{
 		linearErrorMsg.setVisibility(View.GONE);
 		receiveIntentValues();
 		getDetBtn.setOnClickListener(this);
+		scanButton.setOnClickListener(this);
+		homeButton.setOnClickListener(this);
 		}
 		
 	 public void getScreenDimensions()
@@ -173,7 +181,6 @@ public class getDetails extends Activity implements OnClickListener{
 			
 			if((didItWork))
 			{
-//				Toast.makeText(getApplicationContext(), "values passed to server:"+ Price +","+ Barcode+","+Type+","+Quant+","+deviceId+","+StoreValue, 1000).show();
 				new LoadProducts().execute(" ");				
 			}
 			else
@@ -187,13 +194,41 @@ public class getDetails extends Activity implements OnClickListener{
 			    });
 			}
 		   break;
+		case R.id.scan_button:
+			IntentIntegrator.initiateScan(this, R.layout.capture,
+	                R.id.viewfinder_view, R.id.preview_view, false);
+			break;
+		
+		case R.id.home_button:
+			Intent tab = new Intent(getDetails.this,TabHostActivity.class);
+        	tab.putExtra("device_id", deviceId);
+		    startActivity(tab);
+			break;	
 		}
 	}
 
-//	public void setColorText() {
-//		// TODO Auto-generated method stub
-//		PriceTxt.setTextColor(Color.RED);
-//	}
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    super.onActivityResult(requestCode, resultCode, data);
+	    switch (requestCode) {
+	        case IntentIntegrator.REQUEST_CODE:
+	            IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode,
+	                    resultCode, data);
+	            if (scanResult == null) {
+	                return;
+	            }
+	            final String result = scanResult.getContents();
+	            if (result != null) {
+	                handler.post(new Runnable() {
+	                    @Override
+	                    public void run() {
+	                    	contentTxt.setText(result);    
+	                    }
+	                });
+	            }
+	            break;
+	        default:
+	    }
+	}
 
 	
 	 public class LoadProducts extends AsyncTask<String,Integer,String>{
@@ -210,7 +245,7 @@ public class getDetails extends Activity implements OnClickListener{
 	                for(int i=0;i<6;i++){
 	                publishProgress(5);
 	                try {
-	                    Thread.sleep(500);// the timing set to a large value
+	                    Thread.sleep(1200);// the timing set to a large value
 	                } catch (InterruptedException e) {
 	                    e.printStackTrace();
 	                }
@@ -246,7 +281,7 @@ public class getDetails extends Activity implements OnClickListener{
 				
 				if(ProductId!="null")
 				{
-					if(jsonPro.getString("other_locations")!="null")
+				if(jsonPro.getString("other_locations")!="null")
 				{
 					
 				JSONArray productArray = new JSONArray(jsonPro.getString("other_locations"));
@@ -325,6 +360,21 @@ public class getDetails extends Activity implements OnClickListener{
         // Making the HTTP request
 	        
 	        try {
+	        	
+	        	if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) >= 9) {
+	    	        try {
+	    	            // StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.LAX);
+	    	            Class<?> strictModeClass = Class.forName("android.os.StrictMode", true, Thread.currentThread()
+	    	                    .getContextClassLoader());
+	    	            Class<?> threadPolicyClass = Class.forName("android.os.StrictMode$ThreadPolicy", true, Thread.currentThread()
+	    	                    .getContextClassLoader());
+	    	            Field laxField = threadPolicyClass.getField("LAX");
+	    	            Method setThreadPolicyMethod = strictModeClass.getMethod("setThreadPolicy", threadPolicyClass);
+	    	            setThreadPolicyMethod.invoke(strictModeClass, laxField.get(null));
+	    	        } catch (Exception e) {
+	    	        }
+	    	    }
+	        	
 	        	ProductDet.setText("");
 	        	Results.setText("");
 	        	if(!isConnected(getDetails.this)){
@@ -338,13 +388,22 @@ public class getDetails extends Activity implements OnClickListener{
 				    });
 		        	return null;
 		        }
-	            DefaultHttpClient httpClient = new DefaultHttpClient();
-	            HttpPost httpPost = new HttpPost(url);
-	            httpPost.setEntity(new UrlEncodedFormEntity(params));
-	            HttpResponse httpResponse = httpClient.execute(httpPost);
-	            HttpEntity httpEntity = httpResponse.getEntity();
-	            is = httpEntity.getContent();
-	        } catch (UnsupportedEncodingException e) {
+	        	 HttpParams httpParameters = new BasicHttpParams();
+		         HttpConnectionParams.setConnectionTimeout(httpParameters, 30000);
+		         HttpConnectionParams.setSoTimeout(httpParameters, 10000);
+		         HttpClient httpClient = new DefaultHttpClient(httpParameters);
+	             httpClient.getConnectionManager();
+	             HttpPost httpPost = new HttpPost(url);
+	             httpPost.setEntity(new UrlEncodedFormEntity(params));
+	             HttpResponse httpResponse = httpClient.execute(httpPost);
+	             HttpEntity httpEntity = httpResponse.getEntity();
+	             is = httpEntity.getContent();
+	        }
+	        catch (ConnectTimeoutException e) {
+	        	Results.setText("Connection Timeout");
+				linearErrorMsg.setVisibility(View.VISIBLE);
+	        } 
+	        catch (UnsupportedEncodingException e) {
 	            e.printStackTrace();
 	        } catch (ClientProtocolException e) {
 	            e.printStackTrace();

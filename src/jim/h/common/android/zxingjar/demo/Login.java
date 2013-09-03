@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +69,7 @@ public class Login	extends Activity implements OnClickListener{
 		  {
 			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.small_my_title);	
 		  }
-		  findViewById(R.id.logo_btn).setOnClickListener(new OnClickListener() {
+		  findViewById(R.id.linear_back_btn).setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,	KeyEvent.KEYCODE_BACK));
 					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
@@ -233,6 +235,21 @@ public class Login	extends Activity implements OnClickListener{
 	        // Making the HTTP request
 		        
 		        try {
+		        	
+		        	if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) >= 9) {
+		    	        try {
+		    	            // StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.LAX);
+		    	            Class<?> strictModeClass = Class.forName("android.os.StrictMode", true, Thread.currentThread()
+		    	                    .getContextClassLoader());
+		    	            Class<?> threadPolicyClass = Class.forName("android.os.StrictMode$ThreadPolicy", true, Thread.currentThread()
+		    	                    .getContextClassLoader());
+		    	            Field laxField = threadPolicyClass.getField("LAX");
+		    	            Method setThreadPolicyMethod = strictModeClass.getMethod("setThreadPolicy", threadPolicyClass);
+		    	            setThreadPolicyMethod.invoke(strictModeClass, laxField.get(null));
+		    	        } catch (Exception e) {
+		    	        }
+		    	    }
+		        	
 		        	lblMsg.setText("");
 		        	if(!isConnected(Login.this)){
 		        		Toast.makeText(getApplicationContext(), "Check your internet connection", 1000).show();

@@ -49,7 +49,7 @@ public class showDetails extends Activity implements OnClickListener{
 		  {
 			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.small_my_title);	
 		  }
-		findViewById(R.id.logo_btn).setOnClickListener(new OnClickListener() {
+		findViewById(R.id.linear_back_btn).setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,	KeyEvent.KEYCODE_BACK));
 					dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
@@ -139,7 +139,7 @@ public class showDetails extends Activity implements OnClickListener{
 	
 	public void ShowDetails(String scanFormat)
 	{
-			Intent getDet = new Intent(this,getStoreDetails.class);
+			Intent getDet = new Intent(this,getDetails.class);
 			getDet.putExtra("BarCode", scanFormat);
 			getDet.putExtra("lat", lat);
 			getDet.putExtra("lon", lon);

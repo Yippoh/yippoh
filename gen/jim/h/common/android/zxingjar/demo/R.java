@@ -20,6 +20,10 @@ public final class R {
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
+
+         Customize dimensions originally defined in res/values/dimens.xml (such as
+         screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
+    
          */
         public static final int activity_horizontal_margin=0x7f040000;
         public static final int activity_vertical_margin=0x7f040001;
@@ -48,30 +52,30 @@ public final class R {
         public static final int AddressTxt=0x7f080026;
         public static final int Cancel_btn=0x7f08000b;
         public static final int LblHistory=0x7f08002a;
-        public static final int LblRewards=0x7f080038;
-        public static final int LblStoreTitle=0x7f080033;
-        public static final int Lblpopmsg=0x7f080037;
+        public static final int LblRewards=0x7f08003a;
+        public static final int LblStoreTitle=0x7f080035;
+        public static final int Lblpopmsg=0x7f080039;
         public static final int LocPriceTxt=0x7f080027;
         public static final int LocationDetLbl=0x7f080022;
         public static final int LocationDetailsTbl=0x7f080023;
-        public static final int LocationDetlbl=0x7f080046;
+        public static final int LocationDetlbl=0x7f080048;
         public static final int PriceLbl=0x7f080025;
         public static final int ProductDet=0x7f080020;
         public static final int Results=0x7f080021;
-        public static final int Scrol_PopUp=0x7f080032;
-        public static final int StoreDetails=0x7f080035;
+        public static final int Scrol_PopUp=0x7f080034;
+        public static final int StoreDetails=0x7f080037;
         public static final int StoreName=0x7f080018;
         public static final int Submit=0x7f08000a;
-        public static final int Submit_btn=0x7f080036;
+        public static final int Submit_btn=0x7f080038;
         public static final int TxtEmail=0x7f080003;
         public static final int TxtLblRewards=0x7f080005;
         public static final int Txttitle=0x7f080011;
-        public static final int back=0x7f08002f;
+        public static final int back=0x7f080030;
         public static final int get_details_btn=0x7f08001f;
         public static final int header=0x7f08002e;
         public static final int historyDetailsTbl=0x7f08002b;
         public static final int home_button=0x7f080029;
-        public static final int image=0x7f080047;
+        public static final int image=0x7f080033;
         public static final int imageLine=0x7f080004;
         public static final int lblEmail=0x7f080007;
         public static final int lblMsg=0x7f08000e;
@@ -83,34 +87,35 @@ public final class R {
         public static final int linearLayout3=0x7f080016;
         public static final int linearLayout4=0x7f080019;
         public static final int linearLayout5=0x7f08001c;
-        public static final int linearLayout6=0x7f080045;
-        public static final int logo_btn=0x7f080030;
+        public static final int linearLayout6=0x7f080047;
+        public static final int linear_back_btn=0x7f08002f;
+        public static final int logo_btn=0x7f080031;
         public static final int msgLbl=0x7f08002c;
         public static final int myFooter=0x7f080010;
         public static final int preview_view=0x7f080000;
         public static final int priceTypeText=0x7f08001b;
         public static final int priceTypelbl=0x7f08001a;
-        public static final int productBarcodeLbl=0x7f080043;
-        public static final int productBarcodeTxt=0x7f080044;
-        public static final int productIdLbl=0x7f08003b;
-        public static final int productIdTxt=0x7f08003c;
-        public static final int productManuLbl=0x7f080041;
-        public static final int productManuTxt=0x7f080042;
-        public static final int productNameLbl=0x7f08003d;
-        public static final int productNameTxt=0x7f08003e;
-        public static final int productPriceLbl=0x7f08003f;
-        public static final int productPriceTxt=0x7f080040;
+        public static final int productBarcodeLbl=0x7f080045;
+        public static final int productBarcodeTxt=0x7f080046;
+        public static final int productIdLbl=0x7f08003d;
+        public static final int productIdTxt=0x7f08003e;
+        public static final int productManuLbl=0x7f080043;
+        public static final int productManuTxt=0x7f080044;
+        public static final int productNameLbl=0x7f08003f;
+        public static final int productNameTxt=0x7f080040;
+        public static final int productPriceLbl=0x7f080041;
+        public static final int productPriceTxt=0x7f080042;
         public static final int productQualbl=0x7f08001d;
         public static final int productquaTxt=0x7f08001e;
-        public static final int rd_Store_Group=0x7f080034;
-        public static final int redeem_btn=0x7f080039;
+        public static final int rd_Store_Group=0x7f080036;
+        public static final int redeem_btn=0x7f08003b;
         public static final int scan_button=0x7f080028;
         public static final int scan_content=0x7f080013;
         public static final int scan_result=0x7f08002d;
         public static final int scroll_view=0x7f08000f;
         public static final int status_view=0x7f080002;
-        public static final int textview1=0x7f08003a;
-        public static final int title=0x7f080031;
+        public static final int textview1=0x7f08003c;
+        public static final int title=0x7f080032;
         public static final int tvResultlbl=0x7f080012;
         public static final int txtEmail=0x7f080008;
         public static final int txtPrice=0x7f080015;
@@ -130,16 +135,19 @@ public final class R {
         public static final int login=0x7f030009;
         public static final int main=0x7f03000a;
         public static final int my_title=0x7f03000b;
-        public static final int popup=0x7f03000c;
-        public static final int progress_bar=0x7f03000d;
-        public static final int rewards=0x7f03000e;
-        public static final int row_border=0x7f03000f;
-        public static final int scan=0x7f030010;
-        public static final int show_details=0x7f030011;
-        public static final int small_my_title=0x7f030012;
-        public static final int splash=0x7f030013;
-        public static final int tab_host=0x7f030014;
-        public static final int table_row=0x7f030015;
+        public static final int page_splash=0x7f03000c;
+        public static final int popup=0x7f03000d;
+        public static final int progress_bar=0x7f03000e;
+        public static final int rewards=0x7f03000f;
+        public static final int row_border=0x7f030010;
+        public static final int scan=0x7f030011;
+        public static final int show_details=0x7f030012;
+        public static final int small_my_title=0x7f030013;
+        public static final int splash=0x7f030014;
+        public static final int tab_host=0x7f030015;
+        public static final int tab_host_small_title=0x7f030016;
+        public static final int tab_host_title=0x7f030017;
+        public static final int table_row=0x7f030018;
     }
     public static final class string {
         public static final int Address=0x7f05000e;
@@ -186,9 +194,22 @@ public final class R {
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         
+
+        Base application theme for API 11+. This theme completely replaces
+        AppBaseTheme from res/values/styles.xml on API 11+ devices.
+    
+ API 11 theme customizations can go here. 
+
+        Base application theme for API 14+. This theme completely replaces
+        AppBaseTheme from BOTH res/values/styles.xml and
+        res/values-v11/styles.xml on API 14+ devices.
+    
+ API 14 theme customizations can go here. 
          */
         public static final int AppBaseTheme=0x7f070000;
         /**  Application theme. 
+ All customizations that are NOT specific to a particular API-level can go here. 
+ All customizations that are NOT specific to a particular API-level can go here. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
         public static final int AppTheme=0x7f070001;

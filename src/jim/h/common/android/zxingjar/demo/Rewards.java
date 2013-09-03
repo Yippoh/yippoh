@@ -5,8 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import jim.h.common.android.zxingjar.demo.getDetails.LoadProducts;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -15,17 +19,23 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.text.Html;
@@ -65,6 +75,8 @@ public class Rewards extends Activity implements OnClickListener{
 		Results=(TextView)findViewById(R.id.Results);
 		redeem=(Button)findViewById(R.id.redeem_btn);
 		linearErrorMsg=(LinearLayout)findViewById(R.id.linearErrorMsg);
+		msgLbl.setVisibility(View.GONE);
+		msgLbl.setText("");
 		getDeviceId();
 		getLocation();
 		ShowRewards();
@@ -114,143 +126,176 @@ public class Rewards extends Activity implements OnClickListener{
 		
 		switch(v.getId()) {
 		case R.id.redeem_btn:
-			DatabaseHandler db = new DatabaseHandler(this);
-			int checkexists = db.CheckExists(DeviceId);
-	    	if(checkexists>0)
-	    	{
-	    		Contact exists =db.getContact(DeviceId);
-	    		if(exists._email_id==null)
-    			{
-    				
-    				  LayoutInflater layoutInflater 
-				         = (LayoutInflater)getBaseContext()
-				             .getSystemService(LAYOUT_INFLATER_SERVICE);  
-				      final View popupView = layoutInflater.inflate(R.layout.emailpopup, null);  
-    				  final PopupWindow popup = new PopupWindow(Rewards.this);
-    				  int width= screenWidth - 50;
-					  int height= screenHeight - 250;
-					  popup.setContentView(popupView);
-					  popup.setWidth(width);
-					  popup.setHeight(height);
-					  popup.setFocusable(true);
-					  popup.showAtLocation(popupView, Gravity.CENTER, 0, 20);
-					  final EditText txtEmail=(EditText)popupView.findViewById(R.id.txtEmail);
-					  final LinearLayout linearErrorMsg=(LinearLayout)popupView.findViewById(R.id.linearErrorMsg);
-					  linearErrorMsg.setVisibility(View.GONE);
-					  Button close = (Button) popupView.findViewById(R.id.Cancel_btn);
-					   close.setOnClickListener(new OnClickListener() {
-					 
-					     @Override
-					     public void onClick(View v) {
-					       popup.dismiss();
-					     }
-					   });
-					  Button submit = (Button) popupView.findViewById(R.id.Submit);
-					  submit.setOnClickListener(new OnClickListener() {
-					 
-					     @Override
-					     public void onClick(View v) {
-					    	 boolean didEmail=false;
-					    	 String Email=txtEmail.getText().toString();
-								if(Email.length() == 0)
-								{
-									didEmail=false;
-								}
-								else
-								{
-									didEmail=true;
-								}
-								
-								if((didEmail))
-								{
-									linearErrorMsg.setVisibility(View.GONE);
-									JSONObject json = getUsers(Email,DeviceId);
-									if(json != null)
-									{
-										try {
-											String message = json.getString("message");
-//											Toast.makeText(getApplicationContext(), message, 500).show();
-											
-											if((message.equalsIgnoreCase("success")==true) || (message.equalsIgnoreCase("Data already exist")==true))
-											{
-												DatabaseHandler db = new DatabaseHandler(Rewards.this);
-												int checkexists = db.CheckExists(DeviceId);
-										    	if(checkexists>0)
-										    	{
-												    Contact exists = db.getContact(DeviceId);
-													int count=0;
-													count=exists._count+1;
-										    		if((exists._device_id.equalsIgnoreCase(DeviceId)== true))
-										    		{
-										    			db.updateContact(new Contact(DeviceId,Email,count));
-										    			JSONObject jsonEmail = sendEmail(DeviceId,Email);
-									    				if(jsonEmail!=null)
-									    				{
-									    					try 
-									    					{
-									    						String Emailmessage = jsonEmail.getString("message");
-									    						String MailSendMsg = jsonEmail.getString("success");
-									    						 msgLbl.setVisibility(View.VISIBLE);
-									    	    				 msgLbl.setText(MailSendMsg);
-//									    						Toast.makeText(getApplicationContext(), "message:"+MailSendMsg, 500).show();
-									    					}
-									    					catch (JSONException e) {
-									    						e.printStackTrace();
-									    					}
-									    				}
-										    		}
-										    	}
-
-											}
-										} 
-										catch (JSONException e) {
-												e.printStackTrace();
-										 }
-										 popup.dismiss();
-								}
-								else
-								{
-									
-								}
-					    	
-								}
-								else
-								{
-									linearErrorMsg.setVisibility(View.VISIBLE);
-								}
-					     }
-					     });
-					     
-    			}
-    			else
-    			{
-    				String Email=exists._email_id;
-    				JSONObject jsonEmail = sendEmail(DeviceId,Email);
-    				if(jsonEmail!=null)
-    				{
-    					try 
-    					{
-    						String message = jsonEmail.getString("message");
-//    						Toast.makeText(getApplicationContext(), "message:"+message, 500).show();
-    						String MailSendMsg = jsonEmail.getString("success");
-    						msgLbl.setVisibility(View.VISIBLE);
-    						msgLbl.setText(MailSendMsg);
-    					}
-    					catch (JSONException e) {
-    						e.printStackTrace();
-    					}
-    				}
-	    			else
-	    			{
-	    				Toast.makeText(getApplicationContext(), "No Values Retrieved...", 1000).show();
-	    				 msgLbl.setVisibility(View.VISIBLE);
-	    				 msgLbl.setText("Check your Internet connection");
-	    			}
-    			}
-	    	}
+			msgLbl.setVisibility(View.GONE);
+			msgLbl.setText("");
+			new LoadReedem().execute(" ");
 			break;
 		}
     }
+	
+	 public class LoadReedem extends AsyncTask<String,Integer,String>{
+	        ProgressDialog dialog;
+	        protected void onPreExecute(){
+	            dialog = new ProgressDialog(Rewards.this);            
+	                            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+	            dialog.setMax(100);
+	            dialog.setMessage("Loading...");
+	            dialog.show();              
+	        }
+	        @Override
+	        protected String doInBackground(String... arg0) {
+	                for(int i=0;i<6;i++){
+	                publishProgress(5);
+	                try {
+	                    Thread.sleep(1200);// the timing set to a large value
+	                } catch (InterruptedException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	            dialog.dismiss();
+	            return null;
+	        }
+	    protected void  onProgressUpdate(Integer...progress){
+	        dialog.incrementProgressBy(progress[0]);
+	    }
+	        protected void onPostExecute(String result){
+	        	DatabaseHandler db = new DatabaseHandler(Rewards.this);
+				int checkexists = db.CheckExists(DeviceId);
+		    	if(checkexists>0)
+		    	{
+		    		Contact exists =db.getContact(DeviceId);
+		    		if(exists._email_id==null)
+	    			{
+	    				
+	    				  LayoutInflater layoutInflater 
+					         = (LayoutInflater)getBaseContext()
+					             .getSystemService(LAYOUT_INFLATER_SERVICE);  
+					      final View popupView = layoutInflater.inflate(R.layout.emailpopup, null);  
+	    				  final PopupWindow popup = new PopupWindow(Rewards.this);
+	    				  int width= screenWidth - 50;
+						  int height= screenHeight - 250;
+						  popup.setContentView(popupView);
+						  popup.setWidth(width);
+						  popup.setHeight(height);
+						  popup.setFocusable(true);
+						  popup.showAtLocation(popupView, Gravity.CENTER, 0, 20);
+						  final EditText txtEmail=(EditText)popupView.findViewById(R.id.txtEmail);
+						  final LinearLayout linearErrorMsg=(LinearLayout)popupView.findViewById(R.id.linearErrorMsg);
+						  linearErrorMsg.setVisibility(View.GONE);
+						  Button close = (Button) popupView.findViewById(R.id.Cancel_btn);
+						   close.setOnClickListener(new OnClickListener() {
+						 
+						     @Override
+						     public void onClick(View v) {
+						       popup.dismiss();
+						     }
+						   });
+						  Button submit = (Button) popupView.findViewById(R.id.Submit);
+						  submit.setOnClickListener(new OnClickListener() {
+						 
+						     @Override
+						     public void onClick(View v) {
+						    	 boolean didEmail=false;
+						    	 String Email=txtEmail.getText().toString();
+									if(Email.length() == 0)
+									{
+										didEmail=false;
+									}
+									else
+									{
+										didEmail=true;
+									}
+									
+									if((didEmail))
+									{
+										linearErrorMsg.setVisibility(View.GONE);
+										JSONObject json = getUsers(Email,DeviceId);
+										if(json != null)
+										{
+											try {
+												String message = json.getString("message");
+//												Toast.makeText(getApplicationContext(), message, 500).show();
+												
+												if((message.equalsIgnoreCase("success")==true) || (message.equalsIgnoreCase("Data already exist")==true))
+												{
+													DatabaseHandler db = new DatabaseHandler(Rewards.this);
+													int checkexists = db.CheckExists(DeviceId);
+											    	if(checkexists>0)
+											    	{
+													    Contact exists = db.getContact(DeviceId);
+														int count=0;
+														count=exists._count+1;
+											    		if((exists._device_id.equalsIgnoreCase(DeviceId)== true))
+											    		{
+											    			db.updateContact(new Contact(DeviceId,Email,count));
+											    			JSONObject jsonEmail = sendEmail(DeviceId,Email);
+										    				if(jsonEmail!=null)
+										    				{
+										    					try 
+										    					{
+										    						String Emailmessage = jsonEmail.getString("message");
+										    						String MailSendMsg = jsonEmail.getString("success");
+										    						 msgLbl.setVisibility(View.VISIBLE);
+										    	    				 msgLbl.setText(MailSendMsg);
+//										    						Toast.makeText(getApplicationContext(), "message:"+MailSendMsg, 500).show();
+										    					}
+										    					catch (JSONException e) {
+										    						e.printStackTrace();
+										    					}
+										    				}
+											    		}
+											    	}
+
+												}
+											} 
+											catch (JSONException e) {
+													e.printStackTrace();
+											 }
+											 popup.dismiss();
+									}
+									else
+									{
+										
+									}
+						    	
+									}
+									else
+									{
+										linearErrorMsg.setVisibility(View.VISIBLE);
+									}
+						     }
+						     });
+						     
+	    			}
+	    			else
+	    			{
+	    				String Email=exists._email_id;
+	    				JSONObject jsonEmail = sendEmail(DeviceId,Email);
+	    				if(jsonEmail!=null)
+	    				{
+	    					try 
+	    					{
+	    						String message = jsonEmail.getString("message");
+//	    						Toast.makeText(getApplicationContext(), "message:"+message, 500).show();
+	    						String MailSendMsg = jsonEmail.getString("success");
+	    						msgLbl.setVisibility(View.VISIBLE);
+	    						msgLbl.setText(MailSendMsg);
+	    					}
+	    					catch (JSONException e) {
+	    						e.printStackTrace();
+	    					}
+	    				}
+		    			else
+		    			{
+		    				Toast.makeText(getApplicationContext(), "No Values Retrieved...", 1000).show();
+		    				 msgLbl.setVisibility(View.VISIBLE);
+		    				 msgLbl.setText("Check your Internet connection");
+		    			}
+	    			}
+		    	}
+	        }
+	 }
+	        
 	public void ShowRewards()
 	{
 		JSONObject json = getHistory(lat,lon,DeviceId);
@@ -339,30 +384,42 @@ public class Rewards extends Activity implements OnClickListener{
 	        // Making the HTTP request
 		        
 		        try {
+		        	
+		        	if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) >= 9) {
+		    	        try {
+		    	            // StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.LAX);
+		    	            Class<?> strictModeClass = Class.forName("android.os.StrictMode", true, Thread.currentThread()
+		    	                    .getContextClassLoader());
+		    	            Class<?> threadPolicyClass = Class.forName("android.os.StrictMode$ThreadPolicy", true, Thread.currentThread()
+		    	                    .getContextClassLoader());
+		    	            Field laxField = threadPolicyClass.getField("LAX");
+		    	            Method setThreadPolicyMethod = strictModeClass.getMethod("setThreadPolicy", threadPolicyClass);
+		    	            setThreadPolicyMethod.invoke(strictModeClass, laxField.get(null));
+		    	        } catch (Exception e) {
+		    	        }
+		    	    }
+		        	
 		        	if(!isConnected(Rewards.this))
 		        	{
 		        		Toast.makeText(getApplicationContext(), "Check your Internet connection", 1000).show();
-//						ProductDet.postDelayed(new Runnable() {
-//						    public void run() {
-//						    	ProductDet.setText("Product Details:");
-//						    }
-//						}, 2000);
-//						
-//						Results.postDelayed(new Runnable() {
-//						    public void run() {
-//						    	Results.setText( "Check your Internet connection");
-//						    }
-//						}, 2000);
 			        	return null;
 			        }
-		        	HttpClient httpClient = new DefaultHttpClient();
-		            httpClient.getConnectionManager();
-		            HttpPost httpPost = new HttpPost(url);
-		            httpPost.setEntity(new UrlEncodedFormEntity(params));
-		            HttpResponse httpResponse = httpClient.execute(httpPost);
-		            HttpEntity httpEntity = httpResponse.getEntity();
-		            is = httpEntity.getContent();
-		        } catch (UnsupportedEncodingException e) {
+		        	 HttpParams httpParameters = new BasicHttpParams();
+			         HttpConnectionParams.setConnectionTimeout(httpParameters, 30000);
+			         HttpConnectionParams.setSoTimeout(httpParameters, 10000);
+			         HttpClient httpClient = new DefaultHttpClient(httpParameters);
+		             httpClient.getConnectionManager();
+		             HttpPost httpPost = new HttpPost(url);
+		             httpPost.setEntity(new UrlEncodedFormEntity(params));
+		             HttpResponse httpResponse = httpClient.execute(httpPost);
+		             HttpEntity httpEntity = httpResponse.getEntity();
+		             is = httpEntity.getContent();
+		        }
+		        catch (ConnectTimeoutException e) {
+		        	Results.setText("Connection Timeout");
+					linearErrorMsg.setVisibility(View.VISIBLE);
+		        } 
+		        catch (UnsupportedEncodingException e) {
 		            e.printStackTrace();
 		        } catch (ClientProtocolException e) {
 		            e.printStackTrace();

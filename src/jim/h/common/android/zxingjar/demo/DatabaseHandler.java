@@ -149,14 +149,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	String sql = "SELECT * FROM contacts WHERE device_id = '" + DeviceId + "'";
     	SQLiteDatabase db = this.getReadableDatabase();
     	Cursor cursor = db.rawQuery(sql, null);
-    	       
-//    	if (cursor.moveToFirst()) {
-//    	    // record exists
-//    	} else {
-//    	    // record not found
-//    	}
-    	
-   		 return cursor.getCount();
+  		return cursor.getCount();
     }
     
     
@@ -165,26 +158,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     	String sql = "SELECT device_id FROM contacts WHERE device_id = '" + DeviceId + "' AND email_id IS NOT NULL";
     	SQLiteDatabase db = this.getReadableDatabase();
     	Cursor cursor = db.rawQuery(sql, null);
-//    	 int count=0;
-//    	if (cursor.moveToFirst()) {
-// 	    // record exists
-//    		count =0;
-//  	} else {
-//   	    // record not found
-//  		 count =1;
-//    	}
-    	
-    	 return cursor.getCount();
+    	return cursor.getCount();
     }
-    
-    // Getting contacts Count
-//    public int getContactsCount() {
-//        String countQuery = "SELECT  * FROM " + TABLE_CONTACTS;
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor cursor = db.rawQuery(countQuery, null);
-//        cursor.close();
-// 
-//        // return count
-//        return cursor.getCount();
-//    }
+  
 }

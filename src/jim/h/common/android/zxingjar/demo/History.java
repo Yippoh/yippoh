@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +17,12 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -82,7 +88,7 @@ public class History extends Activity implements OnClickListener{
 	        double latitude = gps.getLatitude();
 	        double longitude = gps.getLongitude();
 	     // \n is for new line
-//	        Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, 800).show();    
+	        Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, 800).show();    
 	        lat=String.valueOf(latitude);
 	        lon=String.valueOf(longitude);
 	        	       
@@ -91,7 +97,7 @@ public class History extends Activity implements OnClickListener{
 	        // GPS or Network is not enabled
 	        // Ask user to enable GPS/network in settings
 	        gps.showSettingsAlert();
-	        Toast.makeText(getApplicationContext(), "Unable to get Location" , 500).show();   
+	        Toast.makeText(getApplicationContext(), "Unable to get Location" , Toast.LENGTH_LONG).show();   
 	    }
 	    
 	}
@@ -111,6 +117,7 @@ public class History extends Activity implements OnClickListener{
 	public void ShowHistroy()
 	{
 		String Page=String.valueOf("0");
+	
 		JSONObject json = getHistory(lat,lon,DeviceId,Page);
 		if(json!=null)
 		{
@@ -119,7 +126,7 @@ public class History extends Activity implements OnClickListener{
 				String message = json.getString("message");
 				if(message.equalsIgnoreCase("No Data Found")==true)
 				{
-					 Toast.makeText(getApplicationContext(), "No Data Found", 500).show();
+					 Toast.makeText(getApplicationContext(), "No Data Found", Toast.LENGTH_LONG).show();
 					 history.setVisibility(View.GONE);
 					 linearErrorMsg.setVisibility(View.VISIBLE);
 					 msgLbl.setVisibility(View.VISIBLE);
@@ -179,10 +186,44 @@ public class History extends Activity implements OnClickListener{
 		{
 			msgLbl.setVisibility(View.VISIBLE);
 			msgLbl.setText("Check your Internet connection");
-			Toast.makeText(getApplicationContext(), "No Values Retrieved...", 1000).show();
+			Toast.makeText(getApplicationContext(), "No Values Retrieved...", Toast.LENGTH_LONG).show();
 		}
 		
 	}
+	
+	public String postData(String lat,String lon,String DeviceId,String page) {
+	    // Create a new HttpClient and Post Header
+		
+	    HttpClient httpclient = new DefaultHttpClient();
+	    HttpPost httppost = new HttpPost("http://115.112.70.158/barcode_stats/history.php");
+        String res=null;
+	    try {
+	        // Add your data
+	    	
+	    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("device_id",DeviceId));
+	        params.add(new BasicNameValuePair("lat",lat));
+	        params.add(new BasicNameValuePair("lon",lon));
+	        params.add(new BasicNameValuePair("page",page));
+	    	
+//	        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+//	        nameValuePairs.add(new BasicNameValuePair("id", "12345"));
+//	        nameValuePairs.add(new BasicNameValuePair("stringdata", "AndDev is Cool!"));
+	        httppost.setEntity(new UrlEncodedFormEntity(params));
+
+	        // Execute HTTP Post Request
+	        HttpResponse response = httpclient.execute(httppost);
+	        
+	        Toast.makeText(getApplicationContext(), "values:"+response, 500).show();
+	        res=response.toString();
+	        
+	    } catch (ClientProtocolException e) {
+	        // TODO Auto-generated catch block
+	    } catch (IOException e) {
+	        // TODO Auto-generated catch block
+	    }
+	    return res;
+	} 
 	public TableRow createRow(String name)
 	{
 	    // Create new row
@@ -254,7 +295,7 @@ public class History extends Activity implements OnClickListener{
 	                for(int i=0;i<6;i++){
 	                publishProgress(5);
 	                try {
-	                    Thread.sleep(1000);// the timing set to a large value
+	                    Thread.sleep(1200);// the timing set to a large value
 	                } catch (InterruptedException e) {
 	                    e.printStackTrace();
 	                }
@@ -400,34 +441,45 @@ public class History extends Activity implements OnClickListener{
 	        // Making the HTTP request
 		        
 		        try {
+		        	
+		        	if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) >= 9) {
+		    	        try {
+		    	            // StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.LAX);
+		    	            Class<?> strictModeClass = Class.forName("android.os.StrictMode", true, Thread.currentThread()
+		    	                    .getContextClassLoader());
+		    	            Class<?> threadPolicyClass = Class.forName("android.os.StrictMode$ThreadPolicy", true, Thread.currentThread()
+		    	                    .getContextClassLoader());
+		    	            Field laxField = threadPolicyClass.getField("LAX");
+		    	            Method setThreadPolicyMethod = strictModeClass.getMethod("setThreadPolicy", threadPolicyClass);
+		    	            setThreadPolicyMethod.invoke(strictModeClass, laxField.get(null));
+		    	        } catch (Exception e) {
+		    	        }
+		    	    }
+		        	
 		        	if(!isConnected(History.this))
 		        	{
-//		        		Toast.makeText(getApplicationContext(), "Check your Internet connection", 1000).show();
 		        		linearErrorMsg.setVisibility(View.VISIBLE);
 		        		msgLbl.setVisibility(View.VISIBLE);
 		    			msgLbl.setText("Check your Internet connection");
-		        		
-//		        		ProductDet.postDelayed(new Runnable() {
-//						    public void run() {
-//						    	ProductDet.setText("Product Details:");
-//						    }
-//						}, 2000);
-//						
-//						Results.postDelayed(new Runnable() {
-//						    public void run() {
-//						    	Results.setText( "Check your Internet connection");
-//						    }
-//						}, 2000);
 			        	return null;
 			        }
-		        	HttpClient httpClient = new DefaultHttpClient();
-		            httpClient.getConnectionManager();
-		            HttpPost httpPost = new HttpPost(url);
-		            httpPost.setEntity(new UrlEncodedFormEntity(params));
-		            HttpResponse httpResponse = httpClient.execute(httpPost);
-		            HttpEntity httpEntity = httpResponse.getEntity();
-		            is = httpEntity.getContent();
-		        } catch (UnsupportedEncodingException e) {
+		        	 HttpParams httpParameters = new BasicHttpParams();
+			         HttpConnectionParams.setConnectionTimeout(httpParameters, 30000);
+			         HttpConnectionParams.setSoTimeout(httpParameters, 10000);
+			         HttpClient httpClient = new DefaultHttpClient(httpParameters);
+		             httpClient.getConnectionManager();
+		             HttpPost httpPost = new HttpPost(url);
+		             httpPost.setEntity(new UrlEncodedFormEntity(params));
+		             HttpResponse httpResponse = httpClient.execute(httpPost);
+		             HttpEntity httpEntity = httpResponse.getEntity();
+		             is = httpEntity.getContent();
+		        }
+		        catch (ConnectTimeoutException e) {
+		        	linearErrorMsg.setVisibility(View.VISIBLE);
+	        		msgLbl.setVisibility(View.VISIBLE);
+	    			msgLbl.setText("Connection Timeout");
+		        }
+		        catch (UnsupportedEncodingException e) {
 		            e.printStackTrace();
 		        } catch (ClientProtocolException e) {
 		            e.printStackTrace();

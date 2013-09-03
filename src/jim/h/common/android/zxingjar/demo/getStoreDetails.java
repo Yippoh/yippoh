@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +17,15 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -723,6 +730,21 @@ public class getStoreDetails extends Activity implements OnClickListener{
         // Making the HTTP request
 	        
 	        try {
+
+	        	if (Integer.valueOf(android.os.Build.VERSION.SDK_INT) >= 9) {
+	    	        try {
+	    	            // StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.LAX);
+	    	            Class<?> strictModeClass = Class.forName("android.os.StrictMode", true, Thread.currentThread()
+	    	                    .getContextClassLoader());
+	    	            Class<?> threadPolicyClass = Class.forName("android.os.StrictMode$ThreadPolicy", true, Thread.currentThread()
+	    	                    .getContextClassLoader());
+	    	            Field laxField = threadPolicyClass.getField("LAX");
+	    	            Method setThreadPolicyMethod = strictModeClass.getMethod("setThreadPolicy", threadPolicyClass);
+	    	            setThreadPolicyMethod.invoke(strictModeClass, laxField.get(null));
+	    	        } catch (Exception e) {
+	    	        }
+	    	    }
+	        	
 	        	TxtStoreDetails.setText("");
 	        	Results.setText("");
 	        	if(!isConnected(getStoreDetails.this)){
@@ -740,12 +762,20 @@ public class getStoreDetails extends Activity implements OnClickListener{
 					}, 2000);
 		        	return null;
 		        }
-	            DefaultHttpClient httpClient = new DefaultHttpClient();
-	            HttpPost httpPost = new HttpPost(url);
-	            httpPost.setEntity(new UrlEncodedFormEntity(params));
-	            HttpResponse httpResponse = httpClient.execute(httpPost);
-	            HttpEntity httpEntity = httpResponse.getEntity();
-	            is = httpEntity.getContent();
+	        	 HttpParams httpParameters = new BasicHttpParams();
+		         HttpConnectionParams.setConnectionTimeout(httpParameters, 30000);
+		         HttpConnectionParams.setSoTimeout(httpParameters, 10000);
+		         HttpClient httpClient = new DefaultHttpClient(httpParameters);
+	             httpClient.getConnectionManager();
+	             HttpPost httpPost = new HttpPost(url);
+	             httpPost.setEntity(new UrlEncodedFormEntity(params));
+	             HttpResponse httpResponse = httpClient.execute(httpPost);
+	             HttpEntity httpEntity = httpResponse.getEntity();
+	             is = httpEntity.getContent();
+	        }
+	        catch (ConnectTimeoutException e) {
+	        	Results.setText("Connection Timeout");
+				
 	        } catch (UnsupportedEncodingException e) {
 	            e.printStackTrace();
 	        } catch (ClientProtocolException e) {

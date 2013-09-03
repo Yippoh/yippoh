@@ -3,9 +3,6 @@ package jim.h.common.android.zxingjar.demo;
 
 
 import java.util.List;
-
-import jim.h.common.android.zxingjar.demo.getStoreDetails.LoadStore;
-
 import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.Intent;
@@ -43,18 +40,15 @@ public class TabHostActivity extends TabActivity implements OnTabChangeListener 
 //		  int size = config.screenLayout & config.SCREENLAYOUT_SIZE_MASK;
 		  if (screenHeight >480)
 		  {
-			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.my_title);	
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.tab_host_title);	
 //			  Toast.makeText(getApplicationContext(), "normal", 100).show();
 			  
 		  }
 		  else
 		  {
-			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.small_my_title);	
+			  getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.tab_host_small_title);	
 		  }
 		  
-		
-		  findViewById(R.id.back).setVisibility(View.GONE);
-		  findViewById(R.id.logo_btn).setEnabled(false);
 		  getLocation();
 		 
 		  receiveDeviceValues();
@@ -213,7 +207,7 @@ public class TabHostActivity extends TabActivity implements OnTabChangeListener 
 	                for(int i=0;i<6;i++){
 	                publishProgress(5);
 	                try {
-	                    Thread.sleep(1000);// the timing set to a large value
+	                    Thread.sleep(1200);// the timing set to a large value
 	                } catch (InterruptedException e) {
 	                    e.printStackTrace();
 	                }
@@ -242,7 +236,7 @@ public class TabHostActivity extends TabActivity implements OnTabChangeListener 
 	                for(int i=0;i<6;i++){
 	                publishProgress(5);
 	                try {
-	                    Thread.sleep(1000);// the timing set to a large value
+	                    Thread.sleep(1200);// the timing set to a large value
 	                } catch (InterruptedException e) {
 	                    e.printStackTrace();
 	                }
